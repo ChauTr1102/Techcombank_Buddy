@@ -1,0 +1,195 @@
+<div style="text-align: center; padding: 20px;">
+        <button id="startBtn" onclick="startRecording()" 
+                style="background: #ff4b4b; color: white; border: none; padding: 15px 30px; 
+                       border-radius: 8px; font-size: 16px; cursor: pointer; margin: 10px;">
+            🎤 Start Recording
+        </button>
+        <button id="stopBtn" onclick="stopRecording()" disabled
+                style="background: #666; color: white; border: none; padding: 15px 30px; 
+                       border-radius: 8px; font-size: 16px; cursor: pointer; margin: 10px;">
+            ⏹️ Stop Recording
+        </button>
+        
+        <div id="status" style="margin: 20px 0; font-size: 18px; font-weight: bold;">
+            Ready to record
+        </div>
+        
+        <div id="timer" style="margin: 10px 0; font-size: 16px; color: #666;">
+            Duration: 00:00
+        </div>
+        
+        <div id="silenceTimer" style="margin: 10px 0; font-size: 14px; color: #999;">
+            
+        </div>
+        
+        <audio id="audioPlayback" controls style="margin: 20px 0; display: none;"></audio>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioContext;
+        let analyser;
+        let microphone;
+        let silenceStart = 0;
+        let silenceThreshold = 5000; // 5 seconds
+        let recordingStartTime;
+        let timerInterval;
+        let silenceCheckInterval;
+        let isRecording = false;
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                // Set up audio context for silence detection
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                microphone = audioContext.createMediaStreamSource(stream);
+                microphone.connect(analyser);
+                
+                analyser.fftSize = 512;
+                analyser.smoothingTimeConstant = 0.8;
+                
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    document.getElementById('audioPlayback').src = audioUrl;
+                    document.getElementById('audioPlayback').style.display = 'block';
+                    
+                    // Convert to base64 and send to Streamlit
+                    const reader = new FileReader();
+                    reader.onloadend = function() {
+                        const base64Audio = reader.result.split(',')[1];
+                        window.parent.postMessage({
+                            type: 'streamlit:setComponentValue',
+                            value: {
+                                audio_data: base64Audio,
+                                status: 'completed'
+                            }
+                        }, '*');
+                    };
+                    reader.readAsDataURL(audioBlob);
+                    
+                    // Clean up
+                    stream.getTracks().forEach(track => track.stop());
+                    if (audioContext) {
+                        audioContext.close();
+                    }
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                recordingStartTime = Date.now();
+                silenceStart = Date.now();
+                
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                document.getElementById('status').textContent = 'Recording... (Speak now)';
+                document.getElementById('status').style.color = '#ff4b4b';
+                
+                // Start timer
+                timerInterval = setInterval(updateTimer, 100);
+                
+                // Start silence detection
+                silenceCheckInterval = setInterval(checkForSilence, 100);
+                
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                document.getElementById('status').textContent = 'Error: Could not access microphone';
+                document.getElementById('status').style.color = '#ff0000';
+            }
+        }
+        
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                isRecording = false;
+                
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                document.getElementById('status').textContent = 'Recording completed';
+                document.getElementById('status').style.color = '#28a745';
+                document.getElementById('silenceTimer').textContent = '';
+                
+                clearInterval(timerInterval);
+                clearInterval(silenceCheckInterval);
+            }
+        }
+        
+        function checkForSilence() {
+            if (!isRecording || !analyser) return;
+            
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Voice detection - focus on human voice frequency range (85Hz - 8000Hz)
+            // For FFT size 256, each bin represents ~86Hz (assuming 44.1kHz sample rate)
+            const voiceStartBin = Math.floor(85 / (audioContext.sampleRate / analyser.fftSize));
+            const voiceEndBin = Math.floor(8000 / (audioContext.sampleRate / analyser.fftSize));
+            
+            // Calculate energy in voice frequency range
+            let voiceEnergy = 0;
+            let totalEnergy = 0;
+            
+            for (let i = 0; i < bufferLength; i++) {
+                totalEnergy += dataArray[i];
+                if (i >= voiceStartBin && i <= voiceEndBin) {
+                    voiceEnergy += dataArray[i];
+                }
+            }
+            
+            const voiceRatio = totalEnergy > 0 ? voiceEnergy / totalEnergy : 0;
+            const averageVoiceLevel = voiceEnergy / (voiceEndBin - voiceStartBin + 1);
+            
+            // More sophisticated voice detection
+            const voiceThreshold = 15; // Minimum voice energy level
+            const voiceRatioThreshold = 0.3; // Voice should be at least 30% of total energy
+            const isVoiceDetected = averageVoiceLevel > voiceThreshold && voiceRatio > voiceRatioThreshold;
+            
+            if (!isVoiceDetected) {
+                // No voice detected
+                const currentTime = Date.now();
+                const silenceDuration = currentTime - silenceStart;
+                
+                if (silenceDuration >= silenceThreshold) {
+                    // 5 seconds without voice, stop recording
+                    document.getElementById('status').textContent = 'Auto-stopping - no voice detected...';
+                    stopRecording();
+                } else {
+                    // Show countdown
+                    const remaining = Math.ceil((silenceThreshold - silenceDuration) / 1000);
+                    document.getElementById('silenceTimer').textContent = 
+                        `No voice detected - auto-stop in ${remaining}s`;
+                    document.getElementById('silenceTimer').style.color = '#ff9500';
+                }
+            } else {
+                // Voice detected, reset silence timer
+                silenceStart = Date.now();
+                document.getElementById('silenceTimer').textContent = '';
+                document.getElementById('status').textContent = 'Recording... (Voice detected)';
+                document.getElementById('status').style.color = '#28a745';
+            }
+        }
+        
+        function updateTimer() {
+            if (!isRecording) return;
+            
+            const elapsed = Date.now() - recordingStartTime;
+            const seconds = Math.floor(elapsed / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            
+            const timeString = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            document.getElementById('timer').textContent = `Duration: ${timeString}`;
+        }
+    </script>
