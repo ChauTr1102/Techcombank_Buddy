@@ -1,0 +1,7 @@
+env/
+
+db_management/raw_data/
+
+__pycache__/
+
+.idea/
