@@ -5,3 +5,7 @@ db_management/raw_data/
 __pycache__/
 
 .idea/
+
+venv/
+
+ui_test.py
