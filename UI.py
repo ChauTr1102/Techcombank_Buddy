@@ -53,7 +53,6 @@ elif not user_id:
 elif not is_user_available(user_id):
     st.write("User ID not found.")
 
-
 # Tab 1: Tổng quan sản phẩm
 if page == "Tổng quan sản phẩm":
     show_ranking(user_id)
@@ -67,7 +66,6 @@ elif page == "Gợi ý cá nhân hóa":
 # Tab 3: Phân tích dữ liệu
 else:
     show_analysis(user_id)
-
 # Footer
 st.markdown("---")
 st.markdown("© 2025 Techcombank. All rights reserved.")
