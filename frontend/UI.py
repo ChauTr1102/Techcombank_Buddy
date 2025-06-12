@@ -1,9 +1,4 @@
-import time
 import streamlit as st
-import pandas as pd
-import json
-from datetime import datetime
-import os
 from dotenv import load_dotenv
 import altair as alt
 from helper import get_ranking, get_ranking_score, get_analysis
@@ -12,11 +7,16 @@ from helper import get_ranking, get_ranking_score, get_analysis
 load_dotenv()
 
 # Thiết lập cấu hình trang
-st.set_page_config(page_title="Techcombank Recommender", layout="wide")
+st.set_page_config(
+    page_title="Techcombank Buddy",
+    page_icon="🤖",
+    layout="wide",
+    initial_sidebar_state="expanded",
 
+)
 # Header với logo Techcombank
 st.image("static/logo_techcombank.png", width=200)  # Thay bằng đường dẫn logo thực tế
-st.title("Techcombank Personalized Recommender")
+st.title("Techcombank Buddy")
 st.markdown("**Hệ thống gợi ý sản phẩm cá nhân hóa dành cho khách hàng Techcombank**")
 
 # Sidebar
