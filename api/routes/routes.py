@@ -8,7 +8,7 @@ def read_root():
     }
 
 
-@router.websocket("/ws/audio")
+@router.websocket("/ws/audio/")
 async def audio_stream(websocket: WebSocket):
     await websocket.accept()
     while True:
@@ -17,11 +17,21 @@ async def audio_stream(websocket: WebSocket):
         await websocket.send_bytes(data)          # ví dụ phát lại
 
 
-@router.post("/upload-audio")
+@router.post("/upload-audio/")
 async def receive_audio(request: Request):
     async def audio_generator():
         async for chunk in request.stream():
             yield chunk                      # mỗi chunk là bytes audio
     # Bạn có thể xử lý audio_generator() hoặc forward nó
     return StreamingResponse(audio_generator(), media_type="audio/wav")
+
+
+@router.post("/stt/")
+async def transcribe(file: UploadFile = File(...)):
+    audio_bytes = await file.read()
+
+    audio_buffer = io.BytesIO(audio_bytes)
+    transcript = stt.retrieve_script(audio_buffer)  
+
+    return transcript
 
