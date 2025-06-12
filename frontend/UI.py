@@ -24,4 +24,3 @@ if audio_data:
         files={"file": ("audio.wav", audio_bytes, "audio/wav")}
     )
     st.text_area("Transcript", value=res.json(), height=300)
-
