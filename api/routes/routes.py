@@ -17,15 +17,6 @@ async def audio_stream(websocket: WebSocket):
         await websocket.send_bytes(data)          # ví dụ phát lại
 
 
-@router.post("/upload-audio/")
-async def receive_audio(request: Request):
-    async def audio_generator():
-        async for chunk in request.stream():
-            yield chunk                      # mỗi chunk là bytes audio
-    # Bạn có thể xử lý audio_generator() hoặc forward nó
-    return StreamingResponse(audio_generator(), media_type="audio/wav")
-
-
 @router.post("/stt/")
 async def transcribe(file: UploadFile = File(...)):
     audio_bytes = await file.read()
@@ -35,3 +26,6 @@ async def transcribe(file: UploadFile = File(...)):
 
     return transcript
 
+@router.post("/sqlAgent/")
+async def sql_agent(query: str):
+    
