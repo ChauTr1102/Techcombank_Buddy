@@ -80,3 +80,17 @@ CREATE TABLE adoption_logs (
 	user_id TEXT REFERENCES customers(user_id),
     product_id TEXT REFERENCES products(product_id)
 );
+
+CREATE TABLE transaction_history(
+	transaction_id text primary key,
+	sender_card_id text,
+	sender_name text,
+	sender_bank text default 'TechcomBank',
+	receiver_card_id text,
+	receiver_name text,
+	receiver_bank text default 'TechcomBank',
+	note text,
+	amount money,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
