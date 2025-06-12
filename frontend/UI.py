@@ -1,9 +1,27 @@
+import time
 import streamlit as st
+import pandas as pd
+import json
+from datetime import datetime
+import os
+from dotenv import load_dotenv
 import altair as alt
 from helper import get_ranking, get_ranking_score, get_analysis
 
-st.title('Techcombank Buddy')
+# Tải biến môi trường
+load_dotenv()
 
+# Thiết lập cấu hình trang
+st.set_page_config(page_title="Techcombank Recommender", layout="wide")
+
+# Header với logo Techcombank
+st.image("static/logo_techcombank.png", width=200)  # Thay bằng đường dẫn logo thực tế
+st.title("Techcombank Personalized Recommender")
+st.markdown("**Hệ thống gợi ý sản phẩm cá nhân hóa dành cho khách hàng Techcombank**")
+
+# Sidebar
+st.sidebar.header("Điều hướng")
+page = st.sidebar.selectbox("Chọn chức năng", ["Trang chủ","Tổng quan sản phẩm", "Gợi ý cá nhân hóa", "Phân tích dữ liệu"])
 
 def show_ranking(user_id):
     ranking = get_ranking(user_id)
@@ -28,15 +46,28 @@ def is_user_available(user_id : str, list_user : list = ["test"]) -> bool:
 
 user_id = st.text_input("Enter User ID")
 if is_user_available(user_id):
-    st.subheader("Product Ranking")
-    show_ranking(user_id)
-
-    st.subheader("Data Visualization")
-    show_ranking_score(user_id)
-
-    st.subheader("Data Analysis")
-    show_analysis(user_id)
+    with st.spinner("waiting..."):
+        st.success("User ID found. Processing...")
 elif not user_id:
     st.write("Please enter a User ID to see the results.")
 elif not is_user_available(user_id):
     st.write("User ID not found.")
+
+# Tab 1: Tổng quan sản phẩm
+if page == "Tổng quan sản phẩm":
+    show_ranking(user_id)
+
+# Tab 2: Gợi ý cá nhân hóa
+elif page == "Gợi ý cá nhân hóa":
+    with st.spinner(text="In progress...", show_time=True):
+        st.header("Gợi ý cá nhân hóa")
+        show_ranking_score(user_id)
+
+# Tab 3: Phân tích dữ liệu
+else:
+    show_analysis(user_id)
+# Footer
+st.markdown("---")
+st.markdown("© 2025 Techcombank. All rights reserved.")
+
+
