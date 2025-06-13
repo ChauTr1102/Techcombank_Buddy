@@ -7,10 +7,19 @@ import shutil
 import asyncio
 from dotenv import load_dotenv, find_dotenv
 import os
-from api.services import speech_to_text
+from api.services.speech_to_text import SpeechToText
 import io
+
+from api.services.routing_agent import RoutingAgent
+
 load_dotenv()
 
-stt = speech_to_text.SpeechToText(apikey=os.getenv("API_KEY"))
+stt = SpeechToText(apikey=os.getenv("API_KEY"))
 router = APIRouter()
+routing_agent = RoutingAgent(apikey=os.getenv("API_KEY"))
+
+class UserInput(BaseModel):
+    user_input: str
+    history: str
+
 
