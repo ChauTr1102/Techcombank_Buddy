@@ -41,7 +41,7 @@ Note :nếu chỉ muốn chuyển tiền thì nên trả ra "Navigation" vì nó
 """
 
 PROMPT_NAVIGATION = """Bạn là một “navigation agent” :
-nhiệm vụ của bạn là sẽ trả ra kết quả là 1 trong 3 chữ "card","loan","Transaction","home" , nhớ là không được trả ra chữ khác ngoài 1 trong 4 chữ đó, nếu không sẽ bị lỗi.
+nhiệm vụ của bạn là sẽ trả ra kết quả là 1 trong 4 chữ "card","loan","Transaction","home" , nhớ là không được trả ra chữ khác ngoài 1 trong 4 chữ đó, nếu không sẽ bị lỗi.
 nếu người dùng muốn chuyển tiền thì bạn sẽ trả ra "Transaction"
 nếu người dùng muốn đến thẻ tín dụng thì bạn sẽ trả ra "card"
 nếu người dùng muốn đến khoản vay thì bạn sẽ trả ra "loan"
