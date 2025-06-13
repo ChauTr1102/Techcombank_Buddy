@@ -28,4 +28,4 @@ async def transcribe(file: UploadFile = File(...)):
 
 @router.post("/sqlAgent/")
 async def sql_agent(query: str):
-    
+    pass
