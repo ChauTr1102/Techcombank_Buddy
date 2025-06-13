@@ -40,3 +40,10 @@ def router_message(user_input: UserInput):
 async def Agent_to_Agent(user_input: str):
     Agent_response = MultiAgent(user_input)
     return Agent_response
+
+
+@router.post("/test_db/")
+def test_db():
+    a = sql_db.test_db()
+    return a
+
