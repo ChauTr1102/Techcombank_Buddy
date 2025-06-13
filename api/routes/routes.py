@@ -35,3 +35,8 @@ def router_message(user_input: UserInput):
     prompt = routing_agent.prompt_routing(user_input.user_input, user_input.history)
     result = routing_agent.routing(prompt)
     return result
+
+@router.post("/A2A/")
+async def Agent_to_Agent(user_input: str):
+    Agent_response = MultiAgent(user_input)
+    return Agent_response
