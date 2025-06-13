@@ -15,3 +15,7 @@ class NavigationAgent:
         )
         prompt = llm_prompt.format(prompt_routing=PROMPT_ROUTING, chat_history=history, user_input=user_input)
         return prompt
+    
+    def routing(self, prompt):
+        result = self.model_llm.invoke(prompt)
+        return result.content
