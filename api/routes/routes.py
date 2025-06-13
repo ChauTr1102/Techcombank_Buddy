@@ -29,3 +29,9 @@ async def transcribe(file: UploadFile = File(...)):
 @router.post("/sqlAgent/")
 async def sql_agent(query: str):
     pass
+
+@router.post("/router_message/")
+def router_message(user_input: UserInput):
+    prompt = routing_agent.prompt_routing(user_input.user_input, user_input.history)
+    result = routing_agent.routing(prompt)
+    return result

@@ -37,4 +37,4 @@ nếu người dùng muốn được điều hướng đến các tính năng c�
 nếu người dung muốn được đề xuất sản phẩm, bạn sẽ trả ra "Recommendation"
 nếu người dùng muốn thực hiện các giao dịch, bạn sẽ trả ra "Transaction"
 những trường hợp còn lại, bạn sẽ trả ra "Assistance"
-""":
+"""
