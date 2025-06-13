@@ -7,10 +7,10 @@ class RoutingAgent:
         self.model_llm = ChatGoogleGenerativeAI(temperature=TEMPERATURE, model="gemini-2.5-flash-preview-05-20",
                                                 api_key=apikey)
 
-    def decision(self, history, user_input):
+    def route_decision(self, history, user_input):
         pass
 
-    def prompt_routing(self, user_input, history):
+    def route_prompt_routing(self, user_input, history):
         llm_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", "**Instruction 1:**\n {prompt_folder}\n"),
@@ -24,5 +24,8 @@ class RoutingAgent:
         prompt = llm_prompt.format(prompt_folder=prompt_folder, prompt_template=prompt_template,
                                    chat_history=history, context=context, web_search_context=web_search_context,
                                    question=question)
+        
+
         return prompt
 
+    

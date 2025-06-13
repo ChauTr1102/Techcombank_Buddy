@@ -26,6 +26,7 @@ async def transcribe(file: UploadFile = File(...)):
 
     return transcript
 
-@router.post("/sqlAgent/")
-async def sql_agent(query: str):
-    pass
+@router.post("/A2A/")
+async def Agent_to_Agent(user_input: str):
+    Agent_response = MultiAgent(user_input)
+    return Agent_response
