@@ -40,3 +40,8 @@ def router_message(user_input: UserInput):
         pass
     return result_router
 
+
+@router.post("/test_db/")
+def test_db():
+    a = sql_db.test_db()
+    return a
