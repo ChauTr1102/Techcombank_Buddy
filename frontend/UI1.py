@@ -27,7 +27,7 @@ with bottom():
     st.session_state["question"] = st.chat_input("Xin chào bạn, mình là Techcombank Buddy!")
     if audio_data:
         audio_bytes = audio_data.getvalue()
-            # Gửi POST request đến FastAPI
+        # Gửi POST request đến FastAPI
         res = requests.post(
             SPEECH_TO_TEXT,
             files={"file": ("audio.wav", audio_bytes, "audio/wav")}
