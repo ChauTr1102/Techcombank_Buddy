@@ -30,6 +30,7 @@ if selected_user:
 def load_transactions():
     return pd.DataFrame()
 
+
 df = load_transactions()
 
 # Kiểm tra nếu có dữ liệu
@@ -70,6 +71,7 @@ else:
 st.title("Đề Xuất Sản Phẩm")
 st.markdown("Phân tích chi tiêu và đề xuất sản phẩm phù hợp với bạn.")
 
+
 # Tạo DataFrame trống cho notifications
 @st.cache_data
 def load_notifications():
@@ -78,6 +80,7 @@ def load_notifications():
         "Đề Xuất Sản Phẩm",
         "Lý Do Đề Xuất"
     ])
+
 
 notifications_df = load_notifications()
 

@@ -49,6 +49,10 @@ nhiệm vụ của bạn là hỗ trợ người dùng một cách thân thiện
 Bạn sẽ nhận được câu input của người dùng và lịch sử cuộc hội thoại trước đó, cũng như một số thông tin ngoài cần thiết.
 Hãy phân tích đầu vào bạn nhận được và đưa ra câu trả lời thích hợp cho người dùng"""
 
+PROMPT_REC="""Bạn là một “recommendation agent”
+"Insurance" , "SavingsAccount" , "Fixed Deposit" , "Overdraft" , "CreditCard" , "FXTransfer" , "InvestmentFund" , "Personal Loan" , "DebitCard" , "Mortgage"
+nếu mà người dùng muốn được recommend sản phẩm mà nó liên quan đến những sản phẩm trên thì trả về tên sản phẩm đó, nếu không thì trả về "No"
+"""
 
 PROMPT_TRANSFER_MONEY = """Bạn là trợ lý tài chính. Khi người dùng yêu cầu chuyển tiền, hãy cố gắng trích xuất:
 1. Tên người nhận (sau từ "cho", ví dụ: "chuyển cho An")
