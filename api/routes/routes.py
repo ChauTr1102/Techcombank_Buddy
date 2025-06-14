@@ -40,10 +40,16 @@ def router_message(user_input: UserInput):
         transaction_prompt = sql_agent.sql_prompt_routing(user_input.user_input, user_input.history)
         sql_query_result = sql_agent.sql_result_from_llm(transaction_prompt)
         fetched_data = sql_db.execute_query(sql_query_result)
+        if len(fetched_data) != 0:
         # lấy prompt và lấy kết quả từ llm
-        assistant_prompt = assistant_agent.assitant_transaction_prompt(user_input.user_input, user_input.history, fetched_data)
-        answer = assistant_agent.get_answer(assistant_prompt)
-        return answer
+            assistant_prompt = assistant_agent.assitant_transaction_prompt(user_input.user_input, user_input.history, fetched_data)
+            answer = assistant_agent.get_answer(assistant_prompt)
+            return answer
+        else:
+            note = "`Note from server: Bạn vẫn có thể truy cập vào database để tìm kiếm thông tin nhưng, không tìm thấy dữ liệu trong database đối với câu hỏi của người dùng`"
+            assistant_prompt = assistant_agent.assitant_transaction_prompt(user_input.user_input, user_input.history, note)
+            answer = assistant_agent.get_answer(assistant_prompt)
+            return answer
     elif result_router == "Assistant":
         assist_prompt = assistant_agent.assitant_prompt(user_input.user_input, user_input.history)
         answer = assistant_agent.get_answer(assist_prompt)
