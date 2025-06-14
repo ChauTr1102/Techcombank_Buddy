@@ -14,8 +14,9 @@ logger = logging.getLogger(__name__)
 
 
 class RecommendationModel:
-    def __init__(self):
-        """Thiết lập kết nối PostgreSQL"""
+    def __init__(self, apikey):
+        self.model_llm = ChatGoogleGenerativeAI(temperature=TEMPERATURE, model="gemini-2.5-flash-preview-05-20",
+                                                api_key=apikey)
         try:
             self.conn = psycopg2.connect(
                 database="Buddy",
@@ -151,4 +152,17 @@ class RecommendationModel:
             logger.error(f"Lỗi khi lấy thông tin phân khúc: {e}")
             raise
 
+    def recommendation_prompt(self, recommendation_data):
+        rcm_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "**Instruction 1:**\n {prompt_rcm}\n"),
+                ("system", "**Recommendation Data:**\n {rcm_data}\n")
+            ]
+        )
+        prompt = rcm_prompt.format(prompt_rcm=PROMPT_RECOMMENDATION_MODEL, rcm_data=recommendation_data)
+        return prompt
+
+    def rcm_explain(self, prompt):
+        result = self.model_llm.invoke(prompt)
+        return result.content
 

@@ -123,12 +123,13 @@ async def get_customer_segment(request: UserRequest):
 
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve))
-    # except Exception as e:
-    #     logger.error(f"Lỗi xử lý yêu cầu: {e}")
-    #     raise HTTPException(status_code=500, detail="Lỗi xử lý yêu cầu")
-    # finally:
-    #     if sql_db:
-    #         sql_db.conn.close()
+
+
+@router.post("/get_explain_for_eight_recommendation/")
+def get_explain_for_eight_recommendation(data: RecommendationData):
+    rcm_prompt = rcm_model.recommendation_prompt(data.data)
+    result = rcm_model.rcm_explain(rcm_prompt)
+    return result
 
 
 

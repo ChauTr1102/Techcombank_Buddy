@@ -70,6 +70,20 @@ Nếu không phải là yêu cầu chuyển tiền, hãy trả lời bình thư�
 Luôn ưu tiên trả về JSON nếu có thể trích xuất dữ liệu chuyển tiền.
 """
 
+PROMPT_RECOMMENDATION_MODEL = """Bạn là bộ não xử lý cuối cùng của một recommendation model của một ngân hàng.
+Nhiệm vụ của bạn là phân tích dữ liệu khách hàng và đưa ra các sản phẩm phù hợp cá nhân hóa với khách hàng đó.
+Bạn sẽ được cung cấp thông tin người dùng và đầu ra các sản phẩm phù hợp với người dùng đó từ model machine learning dưới đây dưới dạng JSON,
+hãy phân tích đưa ra lời giải thích ngắn tầm 15 từ phù hợp vì sao sản phẩm này phù hợp với khách hàng đó.
+Hãy phản hồi dưới dạng JSON như sau:
+{
+  "product_category": Category của sản phẩm,
+  "explain": Giải thích ngắn gọn
+}"""
+
+# và đề xuất ra 3 sản phẩm phù hợp nhất với người dùng từ list sản phẩm được recommend,
+# đồng thời
+
+
 # DATABASE = 'Techcombank_dataset'
 # HOST = 'localhost'
 # PORT = '5432'

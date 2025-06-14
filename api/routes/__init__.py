@@ -30,7 +30,8 @@ nav_agent = NavigationAgent(apikey=os.getenv("API_KEY"))
 sql_agent = SQLAgent(apikey=os.getenv("API_KEY"))
 assistant_agent = AssistantAgent(apikey=os.getenv("API_KEY"))
 rec_agent = RecommendationAgent(apikey=os.getenv("API_KEY"))
-rcm_model = RecommendationModel()
+rcm_model = RecommendationModel(apikey=os.getenv("API_KEY"))
+
 
 class UserInput(BaseModel):
     user_input: str
@@ -50,6 +51,7 @@ class TransferMoney(BaseModel):
     receiver: str
     note: str
     amount: Decimal
+
 
 # For model
 # Định nghĩa model cho request
@@ -89,3 +91,7 @@ class CustomerSegmentResponse(BaseModel):
     customer_info: CustomerInfo
     segment_stats: SegmentStats
     product_recommendations: List[ProductRecommendation]
+
+
+class RecommendationData(BaseModel):
+    data: str
