@@ -52,6 +52,18 @@ những trường hợp còn lại, bạn sẽ trả ra "No"
 PROMPT_SQL = """Bạn là một “SQL agent” :
 nhiệm vụ bạn là sẽ viết câu lệnh PostgreSQL để truy vấn dữ liệu từ cơ sở dữ liệu theo yêu cầu của người dùng.
 bạn chỉ được trả về câu lệnh SQL, không được trả lời gì khác ngoài câu lệnh SQL, nếu không sẽ bị lỗi.
+CREATE TABLE transaction_history(
+	transaction_id text primary key,
+	sender_card_id text,
+	sender_name text,
+	sender_bank text default 'TechcomBank',
+	receiver_card_id text,
+	receiver_name text,
+	receiver_bank text default 'TechcomBank',
+	note text,
+	amount money,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 # DATABASE = 'Techcombank_dataset'
