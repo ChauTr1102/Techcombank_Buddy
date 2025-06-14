@@ -37,7 +37,13 @@ def router_message(user_input: UserInput):
     elif result_router == "Recommendation":
         return "Recommendation"
     elif result_router == "TransactionHistory":
-        return "TransactionHistory"
+        transaction_prompt = sql_agent.sql_prompt_routing(user_input.user_input, user_input.history)
+        sql_query_result = sql_agent.sql_result_from_llm(transaction_prompt)
+        fetched_data = sql_db.execute_query(sql_query_result)
+        # lấy prompt và lấy kết quả từ llm
+        assistant_prompt = assistant_agent.assitant_transaction_prompt(user_input.user_input, user_input.history, fetched_data)
+        answer = assistant_agent.get_answer(assistant_prompt)
+        return answer
     elif result_router == "Assistant":
         return "Assistant"
 
@@ -52,12 +58,12 @@ def test_db():
 def transaction_query(query: TransactionQuery):
     transaction_prompt = sql_agent.sql_prompt_routing(query.query, query.history)
     sql_query_result = sql_agent.sql_result_from_llm(transaction_prompt)
-    # fetched_data = sql_db.execute_query(sql_query_result)
-    # # lấy prompt và lấy kết quả từ llm
-    # assistant_prompt = assistant_agent.assitant_transaction_prompt(query.query, query.history, fetched_data)
-    # answer = assistant_agent.get_answer(assistant_prompt)
+    fetched_data = sql_db.execute_query(sql_query_result)
+    # lấy prompt và lấy kết quả từ llm
+    assistant_prompt = assistant_agent.assitant_transaction_prompt(query.query, query.history, fetched_data)
+    answer = assistant_agent.get_answer(assistant_prompt)
 
-    return sql_query_result
+    return sql_query_result, answer
 
 
 
