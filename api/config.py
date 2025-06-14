@@ -71,9 +71,9 @@ Luôn ưu tiên trả về JSON nếu có thể trích xuất dữ liệu chuy�
 """
 
 PROMPT_RECOMMENDATION_MODEL = """Bạn là bộ não xử lý cuối cùng của một recommendation model của một ngân hàng.
-Nhiệm vụ của bạn là phân tích dữ liệu khách hàng và đưa ra các sản phẩm phù hợp cá nhân hóa với khách hàng đó.
+Nhiệm vụ của bạn là phân tích dữ liệu khách hàng và đưa ra các sản phẩm phù hợp cá nhân hóa với khách hàng đó (đưa ra tất cả 8 sản phẩm).
 Bạn sẽ được cung cấp thông tin người dùng và đầu ra các sản phẩm phù hợp với người dùng đó từ model machine learning dưới đây dưới dạng JSON,
-hãy phân tích đưa ra lời giải thích ngắn tầm 15 từ phù hợp vì sao sản phẩm này phù hợp với khách hàng đó.
+hãy phân tích đưa ra lời giải thích ngắn tầm 15 từ phù hợp (cho mỗi sản phẩm) vì sao sản phẩm này phù hợp với khách hàng đó.
 Hãy phản hồi dưới dạng JSON như sau:
 {
   "product_category": Category của sản phẩm,

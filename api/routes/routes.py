@@ -101,7 +101,7 @@ def get_transaction_history():
     return transaction_history
 
 
-@router.post("/customer-segment/", response_model=CustomerSegmentResponse)
+@router.post("/customer_segment/", response_model=CustomerSegmentResponse)
 async def get_customer_segment(request: UserRequest):
     """Lấy thông tin phân khúc và gợi ý sản phẩm cho khách hàng"""
     try:
