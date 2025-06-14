@@ -11,6 +11,6 @@ class SQLDatabase:
         conn.set_session(autocommit=True)
 
     def test_db(self):
-        self.cur.execute(f"select * from customers")
-        return self.cur.fetchall()
+        self.cur.execute(f"select age from customers where user_id = 'ad089c26-f733-4535-9901-bfbf827272b5'")
+        return self.cur.fetchall()[0][0]
 

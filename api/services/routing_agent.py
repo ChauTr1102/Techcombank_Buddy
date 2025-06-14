@@ -24,4 +24,4 @@ class RoutingAgent:
     def routing(self, prompt):
         result = self.model_llm.invoke(prompt)
         return result.content
-
+    

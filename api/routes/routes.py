@@ -31,15 +31,15 @@ def router_message(user_input: UserInput):
     prompt = routing_agent.prompt_routing(user_input.user_input, user_input.history)
     result_router = routing_agent.routing(prompt)
     if result_router == "Navigation":
-        pass
+        prompt_nav = nav_agent.navigation_prompt(user_input.user_input, user_input.history)
+        result_nav = nav_agent.nav_direction(prompt_nav)
+        return result_nav
     elif result_router == "Recommendation":
-        pass
+        return "Recommendation"
     elif result_router == "Transaction":
-        pass
+        return "Transaction"
     elif result_router == "Assistant":
-        pass
-    return result_router
-
+        return "Assistant"
 
 @router.post("/test_db/")
 def test_db():
