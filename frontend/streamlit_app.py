@@ -61,17 +61,22 @@ with st.sidebar:
         res = requests.post(
             SPEECH_TO_TEXT, files={"file": ("audio.wav", audio_bytes, "audio/wav")}
         )
+        st.session_state.messages.append({"role": "user", "content": res.json()})
+
         payload = {"user_input": f"{res.json()}", "history": ""}
         response = requests.post(url=ROUTER_MESSAGE, json=payload)
 
         navigate_to_page(response.json())
 
-        st.write(response.json())
+
+
     st.markdown("---")
 
-    # 2. CHAT BOX (This code is unchanged)
+    # 2. CHAT BOX
     st.header("Chat")
 
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
@@ -81,13 +86,15 @@ with st.sidebar:
         with st.chat_message("user"):
             st.markdown(prompt)
 
+        payload = {"user_input": f"{prompt}", "history": ""}
+        
+
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                response = (
-                    f"You asked: '{prompt}'. I'm a demo bot, but I'm here to help!"
-                )
-                st.markdown(response)
-
+                response = requests.post(url=ROUTER_MESSAGE, json=payload)
+                st.markdown(response.json())
+                if response.json() in ["card", "home", "loan", "Transaction"]:
+                    navigate_to_page(response.json())
         st.session_state.messages.append({"role": "assistant", "content": response})
 
     st.markdown("---")

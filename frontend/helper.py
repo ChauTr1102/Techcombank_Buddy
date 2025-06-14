@@ -22,12 +22,16 @@ def get_analysis(user_id: str) -> dict:
 def navigate_to_page(navigation_output: str):
     UI_sample_folder_root = "UI_navigate"
     if navigation_output == "card":
+        st.session_state.messages.append({"role": "assistant", "content": "Đang chuyển hướng đến trang thẻ tín dụng..."})
         st.switch_page(f"{UI_sample_folder_root}/card.py")
     elif navigation_output == "home":
+        st.session_state.messages.append({"role": "assistant", "content": "Đang chuyển hướng đến trang chính..."})
         st.switch_page(f"{UI_sample_folder_root}/home.py")
     elif navigation_output == "loan":
+        st.session_state.messages.append({"role": "assistant", "content": "Đang chuyển hướng đến trang vay vốn..."})
         st.switch_page(f"{UI_sample_folder_root}/loan.py")
     elif navigation_output == "Transaction":
+        st.session_state.messages.append({"role": "assistant", "content": "Đang chuyển hướng đến trang giao dịch..."})
         st.switch_page(f"{UI_sample_folder_root}/transaction.py")
     else:
-        st.write("Page not found.")
+        st.session_state.messages.append({"role": "assistant", "content": "Sorry, I don't understand your request. Please try again."})
