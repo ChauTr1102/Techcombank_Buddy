@@ -4,12 +4,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE = os.getenv("DATABASE")
-HOST=os.getenv("HOST")
-PORT=os.getenv("PORT")
-DB_USER=os.getenv("DB_USER")
-PASSWORD=os.getenv("PASSWORD")
-DB_NAME=os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_NAME = os.getenv("DATABASE")
+PASSWORD = os.getenv("PASSWORD")
+HOST = os.getenv("HOST")
+PORT = os.getenv("PORT")
+
 
 def test_connection():
     try:
