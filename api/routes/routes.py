@@ -35,7 +35,15 @@ def router_message(user_input: UserInput):
         result_nav = nav_agent.nav_direction(prompt_nav)
         return result_nav
     elif result_router == "Recommendation":
-        return "Recommendation"
+        recommendation_prompt = rec_agent.recommendation_prompt(user_input.user_input, user_input.history)
+        recommendation_result = rec_agent.recommending(recommendation_prompt)
+        if recommendation_result == "No":
+            return "`Note from server: Không tìm thấy sản phẩm nào phù hợp với yêu cầu của bạn`"
+        Query = "SELECT * FROM products WHERE category = '" + recommendation_result + "'limit 20;"
+        rule_fetched_data = sql_db.execute_query(Query)
+        assistant_prompt_rec = assistant_agent.assitant_transaction_prompt(user_input.user_input, user_input.history, rule_fetched_data)
+        answer_rec = assistant_agent.get_answer(assistant_prompt_rec)
+        return answer_rec
     elif result_router == "TransactionHistory":
         transaction_prompt = sql_agent.sql_prompt_routing(user_input.user_input, user_input.history)
         sql_query_result = sql_agent.sql_result_from_llm(transaction_prompt)
