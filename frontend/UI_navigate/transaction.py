@@ -3,7 +3,6 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 
-
 st.title("📈 Giao Dịch Gần Đây")
 st.markdown("Theo dõi hoạt động tài chính của bạn một cách rõ ràng và trực quan.")
 
@@ -45,3 +44,4 @@ with col3:
     st.success(f"💸 Tổng tiền vào: ₫{total_in:,.0f}")
 with col4:
     st.error(f"💳 Tổng chi tiêu: ₫{abs(total_out):,.0f}")
+
