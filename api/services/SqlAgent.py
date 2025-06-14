@@ -7,7 +7,7 @@ class SQLAgent:
         self.model_llm = ChatGoogleGenerativeAI(temperature=TEMPERATURE, model="gemini-2.5-flash-preview-05-20",
                                                 api_key=apikey)
 
-    def sql_prompt_routing(self, user_input, history):
+    def sql_prompt(self, user_input, history):
         llm_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", "**Instruction 1:**\n {prompt_routing}\n"),
@@ -16,10 +16,16 @@ class SQLAgent:
             ]
         )
         prompt = llm_prompt.format(prompt_routing=PROMPT_ROUTING, chat_history=history, user_input=user_input)
-        result =self.sql_pull(prompt)
-        return result
+
+        return prompt
     
-    def nav_direction(self, prompt):
+    def sql_prompt(self, prompt):
         result = self.model_llm.invoke(prompt)
         return result.content
         
+    def sql_pull(self, sql_query):
+        try:
+            result = execute_sql_query(sql_query)  
+            return result
+        except Exception as e:
+            return f"An error occurred while executing the SQL query: {str(e)}"
