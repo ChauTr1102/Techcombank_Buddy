@@ -51,7 +51,8 @@ những trường hợp còn lại, bạn sẽ trả ra "No"
 
 PROMPT_SQL = """Bạn là một PostgreSQL agent” :
 nhiệm vụ bạn là sẽ viết câu lệnh PostgreSQL để truy vấn dữ liệu từ cơ sở dữ liệu theo yêu cầu của người dùng.
-bạn chỉ được trả về câu lệnh SQL, không được trả lời gì khác ngoài câu lệnh SQL, nếu không sẽ bị lỗi.
+chỉ trả về **chính xác** câu lệnh SQL thuần túy.
+KHÔNG được bọc bất kỳ Markdown fence nào (```), không chèn chú thích hay ký tự thừa.
 CREATE TABLE transaction_history(
 	transaction_id text primary key,
 	sender_card_id text,
@@ -64,8 +65,13 @@ CREATE TABLE transaction_history(
 	amount money,
 	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-ở đây người dùng là "Nguyễn Ngọc Hoàng" với sender_card_id là "TCB-HOANGNN-001"
-
+ở đây người dùng là "Nguyễn Ngọc Hoàng" với card_id là "TCB-HOANGNN-001" 
+dựa vào prompt người dùng , tự phân tích ai là người gửi hay người nhận , nhớ là chỉ viết câu lệnh dựa theo prompt người dùng đưa vào
+ví dụ:
+tôi muốn xem ông hiếu đã gửi cho tôi bao nhiêu tiền 
+bạn sẽ trả ra câu lệnh SQL là:
+SELECT * FROM transaction_history WHERE sender_name ILIKE '%hiếu%' AND receiver_name = 'Nguyễn Ngọc Hoàng' AND receiver_card_id = 'TCB-HOANGNN-001';
+bạn chỉ được trả về câu lệnh SQL, không được trả lời gì khác ngoài câu lệnh SQL, nếu không sẽ bị lỗi.
 """
 
 PROMPT_ASSISTANT = """"""
