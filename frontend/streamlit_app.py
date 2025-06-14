@@ -6,8 +6,7 @@ from streamlit_float import *
 from dotenv import load_dotenv
 from helper import navigate_to_page
 from streamlit_extras.bottom_container import bottom
-import datetime
-import sys
+from datetime import datetime
 import os
 
 # --- PAGE CONFIG ---
@@ -43,7 +42,6 @@ def open_transfer_dialog(receiver, amount):
                 "receiver": receiver,
                 "amount": amount,
                 "note": note,
-                "time": datetime.strftime("%Y-%m-%d %H:%M:%S"),
                 "type": "Chuyển tiền (Dialog)" 
             }
             if "new_transactions" not in st.session_state:
@@ -90,9 +88,6 @@ if "trigger_transfer_dialog" not in st.session_state: # Initialize the flag
 # --- SIDEBAR WIDGETS ---
 with st.sidebar:
 
-    # 1. AUDIO INPUT (with robust reset logic)
-    st.header("Voice Command")
-
     # We use a dynamic key to force a reset after processing
     with bottom():
         if "last_audio" not in st.session_state:
@@ -118,26 +113,21 @@ with st.sidebar:
             # Đẩy vào history và gọi router
             st.session_state.messages.append({"role": "user", "content": transcript})
             payload = {"user_input": transcript, "history": ""}
-            with st.chat_message("assistant"):
-                with st.spinner("Thinking..."):
-                    response = requests.post(ROUTER_MESSAGE, json=payload)
-                    # navigate_to_page(response.json())
-                    st.markdown(response.json())
-                    if response.json() in ["card", "home", "loan", "Transaction"]:
-                        navigate_to_page(response.json())
-                    elif response.json() == "TranferMoney":
-                        payload = {"user_input": transcript, "history": ""}
-                        response = requests.post(url=TRANSFER_MONEY_EXTRACTION, json=payload)
-                        if response.status_code == 200:
-                            open_transfer_dialog(response.json()[0], response.json()[1])
-                    
+            response = requests.post(ROUTER_MESSAGE, json=payload)
+            # navigate_to_page(response.json())
+            if response.json() in ["card", "home", "loan", "Transaction"]:
+                navigate_to_page(response.json())
+            elif response.json() == "TranferMoney":
+                payload = {"user_input": transcript, "history": ""}
+                response = requests.post(url=TRANSFER_MONEY_EXTRACTION, json=payload)
+                if response.status_code == 200:
+                    open_transfer_dialog(response.json()[0], response.json()[1])
+            
             st.session_state.messages.append({"role": "assistant", "content": response.json()})
 
         else:
             # Nếu cùng audio, nhảy qua không làm gì thêm
             pass
-
-    st.markdown("---")
 
     # 2. CHAT BOX
     st.header("Chat")
