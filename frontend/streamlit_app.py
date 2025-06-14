@@ -61,10 +61,12 @@ with st.sidebar:
         res = requests.post(
             SPEECH_TO_TEXT, files={"file": ("audio.wav", audio_bytes, "audio/wav")}
         )
+        st.session_state.messages.append({"role": "user", "content": res.json()})
         payload = {"user_input": f"{res.json()}", "history": ""}
         response = requests.post(url=ROUTER_MESSAGE, json=payload)
 
         navigate_to_page(response.json())
+        st.session_state.messages.append({"role": "assistant", "content": response.json()})
 
         st.write(response.json())
     st.markdown("---")
@@ -86,10 +88,10 @@ with st.sidebar:
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 response = requests.post(url=ROUTER_MESSAGE, json=payload)
-                st.markdown(response)
+                st.markdown(response.json())
                 if response.json() in ["card", "home", "loan", "transaction"]:
                     navigate_to_page(response.json())
-            st.session_state.messages.append({"role": "assistant", "content": response})
+            st.session_state.messages.append({"role": "assistant", "content": response.json()})
 
     st.markdown("---")
 
