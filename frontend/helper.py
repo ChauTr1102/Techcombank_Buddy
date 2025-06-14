@@ -31,3 +31,4 @@ def navigate_to_page(navigation_output: str):
         st.switch_page(f"{UI_sample_folder_root}/transaction.py")
     else:
         st.write("Page not found.")
+
