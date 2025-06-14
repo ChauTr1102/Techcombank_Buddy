@@ -54,9 +54,10 @@ nhiệm vụ bạn là sẽ viết câu lệnh PostgreSQL để truy vấn dữ 
 bạn chỉ được trả về câu lệnh SQL, không được trả lời gì khác ngoài câu lệnh SQL, nếu không sẽ bị lỗi.
 """
 
-DATABASE = 'Techcombank_dataset'
-HOST = 'localhost'
-PORT = '5432'
-USER = 'postgres'
-PASSWORD = '12345678'
+# DATABASE = 'Techcombank_dataset'
+# HOST = 'localhost'
+# PORT = '5432'
+# USER = 'postgres'
+# PASSWORD = '12345678'
+
 

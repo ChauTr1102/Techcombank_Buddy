@@ -2,11 +2,14 @@ import psycopg2
 from api.config import *
 from datetime import datetime
 import secrets
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 
 class SQLDatabase:
     def __init__(self):
-        conn = psycopg2.connect(database=DATABASE, host=HOST, port=PORT, user=USER, password=PASSWORD)
+        conn = psycopg2.connect(database=os.getenv("DATABASE"), host=os.getenv("HOST"), port=os.getenv("PORT"), user=os.getenv("USER"), password=os.getenv("PASSWORD"))
         self.cur = conn.cursor()
         conn.set_session(autocommit=True)
 
