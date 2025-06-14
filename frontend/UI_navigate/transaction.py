@@ -27,18 +27,14 @@ with st.expander("🔍 Lọc giao dịch"):
         from_date = st.date_input("Từ ngày", datetime.now() - timedelta(days=7))
     with col2:
         to_date = st.date_input("Đến ngày", datetime.now())
-    filtered_df = df[(df["Ngày"].dt.date >= from_date) & (df["Ngày"].dt.date <= to_date)]
+filtered_df = df[(df["Ngày"].dt.date >= from_date) & (df["Ngày"].dt.date <= to_date)]
 
 # Hiển thị bảng
-st.dataframe(
-    filtered_df.sort_values(by="Ngày", ascending=False),
-    use_container_width=True,
-    column_config={
-        "Số tiền": st.column_config.NumberColumn(format="₫{:,.0f}"),
-        "Ngày": st.column_config.DateColumn(format="DD-MM-YYYY"),
-    },
-    hide_index=True,
-)
+display_df = filtered_df.copy()
+display_df["Số tiền"] = display_df["Số tiền"].apply(lambda x: f"₫{x:,.0f}".replace(",", "."))  # Format kiểu Việt Nam
+display_df["Ngày"] = display_df["Ngày"].dt.strftime("%d-%m-%Y")  # Format ngày đẹp
+
+st.dataframe(display_df, use_container_width=True, hide_index=True)
 
 # Tổng kết
 total_in = filtered_df[filtered_df["Số tiền"] > 0]["Số tiền"].sum()
