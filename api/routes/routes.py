@@ -85,7 +85,17 @@ def transaction_query(query: TransactionQuery):
 
 @router.post("/transfer_money_extraction/")
 def transfer_money_extraction(user_input: UserInput):
-    receiver, amount = assistant_agent.extract_transfer_info_from_text_ai(user_input.user_input)
-    return receiver, amount
+    receiver, amount, note = assistant_agent.extract_transfer_info_from_text_ai(user_input.user_input)
+    return receiver, amount, note
 
+
+@router.post("/transfer_money/")
+def transfer_money(transfer_info: TransferMoney):
+    sql_db.insert_transfer_money_history(transfer_info.receiver, transfer_info.note, transfer_info.amount)
+    return 1
+
+@router.get("/transaction_history/")
+def get_transaction_history():
+    transaction_history = sql_db.get_transaction_history()
+    return transaction_history
 

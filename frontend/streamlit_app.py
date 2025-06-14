@@ -23,40 +23,50 @@ load_dotenv(dotenv_path="./endpoints.env")
 SPEECH_TO_TEXT = os.getenv("SPEECH_TO_TEXT")
 ROUTER_MESSAGE = os.getenv("ROUTER_MESSAGE")
 TRANSFER_MONEY_EXTRACTION = os.getenv("TRANSFER_MONEY_EXTRACTION")
-
+TRANSFER_MONEY = os.getenv("TRANSFER_MONEY")
 
 # --- TRANSFER DIALOG ---
 @st.dialog("transfer money")
-def open_transfer_dialog(receiver, amount):
+def open_transfer_dialog(receiver, amount, note):
     st.write("📤 Nhập thông tin chuyển tiền")
 
     receiver = st.text_input("👤 Người nhận", key="dialog_receiver_trans", value=receiver)
 
     amount = st.number_input("💰 Số tiền", key="dialog_amount_trans", value=amount)
 
-    note = st.text_area("📝 Nội dung chuyển khoản", key="dialog_note_trans")
+    note = st.text_input("📝 Nội dung chuyển khoản", key="dialog_note_trans", value=note)
 
     if st.button("✅ Xác nhận chuyển tiền", key="dialog_confirm_button_trans"):
-        if receiver and amount >= 1000:
-            st.session_state.transfer_success = True
-            st.session_state.transfer_details = {
-                "receiver": receiver,
-                "amount": amount,
-                "note": note,
-                "time": datetime.strftime("%Y-%m-%d %H:%M:%S"),
-                "type": "Chuyển tiền (Dialog)" 
-            }
-            if "new_transactions" not in st.session_state:
-                st.session_state.new_transactions = []
-            st.session_state.new_transactions.append({
-                "Ngày": datetime.now(),
-                "Loại giao dịch": "Chuyển tiền (Dialog)",
-                "Số tiền": -amount,
-                "Mô tả": f"Chuyển đến {receiver} - {note if note else 'Không ghi chú'}"
-            })
-            st.rerun()
+        transfer_data = {
+            "receiver" : receiver,
+            "note" : note,
+            "amount" : amount
+        }
+        response = requests.post(TRANSFER_MONEY, json=transfer_data)
+        if response.status_code == 200:
+            st.success("✅ Chuyển tiền thành công!")
         else:
-            st.warning("⚠️ Vui lòng nhập đầy đủ Người nhận và Số tiền hợp lệ (tối thiểu 1000).")
+            st.markdown("⚠️ Giao dịch không thành công")
+        # if receiver and amount >= 1000:
+        #     st.session_state.transfer_success = True
+        #     st.session_state.transfer_details = {
+        #         "receiver": receiver,
+        #         "amount": amount,
+        #         "note": note,
+        #         "time": datetime.strftime("%Y-%m-%d %H:%M:%S"),
+        #         "type": "Chuyển tiền (Dialog)" 
+        #     }
+        #     if "new_transactions" not in st.session_state:
+        #         st.session_state.new_transactions = []
+        #     st.session_state.new_transactions.append({
+        #         "Ngày": datetime.now(),
+        #         "Loại giao dịch": "Chuyển tiền (Dialog)",
+        #         "Số tiền": -amount,
+        #         "Mô tả": f"Chuyển đến {receiver} - {note if note else 'Không ghi chú'}"
+        #     })
+        #     st.rerun()
+        # else:
+        #     st.warning("⚠️ Vui lòng nhập đầy đủ Người nhận và Số tiền hợp lệ (tối thiểu 1000).")
 
 
 
@@ -129,7 +139,7 @@ with st.sidebar:
                         payload = {"user_input": transcript, "history": ""}
                         response = requests.post(url=TRANSFER_MONEY_EXTRACTION, json=payload)
                         if response.status_code == 200:
-                            open_transfer_dialog(response.json()[0], response.json()[1])
+                            open_transfer_dialog(response.json()[0], response.json()[1], response.json()[2])
                     
             st.session_state.messages.append({"role": "assistant", "content": response.json()})
 
@@ -166,7 +176,7 @@ with st.sidebar:
                     payload = {"user_input": prompt, "history": ""}
                     response = requests.post(url=TRANSFER_MONEY_EXTRACTION, json=payload)
                     if response.status_code == 200:
-                        open_transfer_dialog(response.json()[0], response.json()[1])
+                        open_transfer_dialog(response.json()[0], response.json()[1], response.json()[2])
                     # navigate_to_page("TranferMoney")
                     # st.rerun()
         st.session_state.messages.append({"role": "assistant", "content": response.json()})

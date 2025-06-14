@@ -30,10 +30,10 @@ class AssistantAgent:
         prompt = llm_prompt.format(prompt_assistant=PROMPT_ASSISTANT, chat_history=history,
                                    transaction_data=transaction_data, user_input=user_input)
         return prompt
+
     def get_answer(self, prompt):
         result = self.model_llm.invoke(prompt)
         return result.content
-
 
     def extract_transfer_info_from_text_ai(self, user_input):
         prompt_template = ChatPromptTemplate.from_messages(
@@ -43,12 +43,12 @@ class AssistantAgent:
             ]
         )
 
-        tranfer_prompt = prompt_template.format_messages(
+        transfer_prompt = prompt_template.format_messages(
             prompt=PROMPT_TRANSFER_MONEY,
             input=user_input
         )
         try:
-            result = self.model_llm.invoke(tranfer_prompt)
+            result = self.model_llm.invoke(transfer_prompt)
             content = result.content.strip()
 
             # Tìm JSON trong nội dung trả về
@@ -58,7 +58,7 @@ class AssistantAgent:
                 json_str = content[json_start:json_end + 1]
                 data = json.loads(json_str)
                 if data.get("action") == "transfer_money":
-                    return [data.get("receiver"), data.get("amount")]
+                    return [data.get("receiver"), data.get("amount"), data.get("note")]
         except Exception as e:
             print(f"[LLM EXTRACT ERROR] {e}")
         return None, None

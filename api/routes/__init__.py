@@ -10,6 +10,8 @@ import os
 from api.services.speech_to_text import SpeechToText
 from api.services.SqlAgent import SQLAgent
 import io
+from decimal import Decimal
+
 
 from api.services.routing_agent import RoutingAgent
 from api.database.database import SQLDatabase
@@ -40,3 +42,7 @@ class TransactionQuery(BaseModel):
     query: str
     history: str
 
+class TransferMoney(BaseModel):
+    receiver: str
+    note: str
+    amount: Decimal
