@@ -15,7 +15,7 @@ class AssistantAgent:
                 ("system", "**Answer the user's input:** {user_input}"),
             ]
         )
-        prompt = llm_prompt.format(prompt_navigation=PROMPT_NAVIGATION, chat_history=history, user_input=user_input)
+        prompt = llm_prompt.format(prompt_assistant=PROMPT_ASSISTANT, chat_history=history, user_input=user_input)
         return prompt
 
     def assitant_transaction_prompt(self, user_input, history, transaction_data):

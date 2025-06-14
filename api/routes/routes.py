@@ -45,7 +45,9 @@ def router_message(user_input: UserInput):
         answer = assistant_agent.get_answer(assistant_prompt)
         return answer
     elif result_router == "Assistant":
-        return "Assistant"
+        assist_prompt = assistant_agent.assitant_prompt(user_input.user_input, user_input.history)
+        answer = assistant_agent.get_answer(assist_prompt)
+        return answer
 
 
 @router.post("/test_db/")
