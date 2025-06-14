@@ -15,7 +15,7 @@ class AssistantAgent:
                 ("system", "**Answer the user's input:** {user_input}"),
             ]
         )
-        prompt = llm_prompt.format(prompt_navigation=PROMPT_NAVIGATION, chat_history=history, user_input=user_input)
+        prompt = llm_prompt.format(prompt_assistant=PROMPT_ASSISTANT, chat_history=history, user_input=user_input)
         return prompt
 
     def assitant_transaction_prompt(self, user_input, history, transaction_data):
@@ -23,11 +23,11 @@ class AssistantAgent:
             [
                 ("system", "**Instruction 1:**\n {prompt_assistant}\n"),
                 ("system", "**Chat history:**\n {chat_history}\n"),
-                ("system", "**Transaction data:**\n {transaction_data"),
+                ("system", "**Transaction data:**\n {transaction_data}\n"),
                 ("system", "**Answer the user's input:** {user_input}"),
             ]
         )
-        prompt = llm_prompt.format(prompt_navigation=PROMPT_NAVIGATION, chat_history=history,
+        prompt = llm_prompt.format(prompt_assistant=PROMPT_ASSISTANT, chat_history=history,
                                    transaction_data=transaction_data, user_input=user_input)
         return prompt
     def get_answer(self, prompt):

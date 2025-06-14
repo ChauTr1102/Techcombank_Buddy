@@ -6,6 +6,7 @@ from streamlit_float import *
 import os
 from dotenv import load_dotenv
 from helper import navigate_to_page
+from streamlit_extras.bottom_container import bottom
 # --- PAGE CONFIG ---
 # Set the initial state of the sidebar to be expanded
 st.set_page_config(
@@ -50,48 +51,70 @@ with st.sidebar:
     st.header("Voice Command")
 
     # We use a dynamic key to force a reset after processing
-    audio_bytes = st.audio_input(
-        "Click the microphone to record:",
-        key=f"audio_input_{st.session_state.audio_key}",
-    )
+    with bottom():
+        if "last_audio" not in st.session_state:
+            st.session_state.last_audio = None
+        audio_bytes = st.audio_input(
+            "Nhấn để nói chuyện:",
+            key=f"audio_input_{st.session_state.audio_key}",
+        )
 
     if audio_bytes:
-        st.toast("received record!")
-        audio_bytes = audio_bytes.getvalue()
-        res = requests.post(
-            SPEECH_TO_TEXT, files={"file": ("audio.wav", audio_bytes, "audio/wav")}
-        )
-        st.session_state.messages.append({"role": "user", "content": res.json()})
-        payload = {"user_input": f"{res.json()}", "history": ""}
-        response = requests.post(url=ROUTER_MESSAGE, json=payload)
+    # Lấy bytes và so sánh
+        audio_bytes_value = audio_bytes.getvalue()
+        if audio_bytes_value != st.session_state.last_audio:
+            # Cập nhật last_audio
+            st.session_state.last_audio = audio_bytes_value
+            st.markdown("Khác")
+            # Thực sự có input mới -> gọi STT
+            res = requests.post(
+                SPEECH_TO_TEXT,
+                files={"file": ("audio.wav", audio_bytes_value, "audio/wav")}
+            )
+            transcript = res.json()
 
-        navigate_to_page(response.json())
-        st.session_state.messages.append({"role": "assistant", "content": response.json()})
+            # Đẩy vào history và gọi router
+            st.session_state.messages.append({"role": "user", "content": transcript})
+            payload = {"user_input": transcript, "history": ""}
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking..."):
+                    response = requests.post(ROUTER_MESSAGE, json=payload)
+                    # navigate_to_page(response.json())
+                    st.markdown(response.json())
+                    if response.json() in ["card", "home", "loan", "Transaction"]:
+                        navigate_to_page(response.json())
+            st.session_state.messages.append({"role": "assistant", "content": response.json()})
 
-        st.write(response.json())
+        else:
+            # Nếu cùng audio, nhảy qua không làm gì thêm
+            st.markdown("giống")
+
     st.markdown("---")
 
-    # 2. CHAT BOX (This code is unchanged)
+    # 2. CHAT BOX
     st.header("Chat")
 
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-
-    if prompt := st.chat_input("What is up?"):
+    with bottom():
+            prompt = st.chat_input("What is up?")
+    if prompt:
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        payload = {"user_input": str(prompt), "history": " "}
+        payload = {"user_input": f"{prompt}", "history": ""}
 
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 response = requests.post(url=ROUTER_MESSAGE, json=payload)
                 st.markdown(response.json())
-                if response.json() in ["card", "home", "loan", "transaction"]:
+                if response.json() in ["card", "home", "loan", "Transaction"]:
                     navigate_to_page(response.json())
-            st.session_state.messages.append({"role": "assistant", "content": response.json()})
+        st.session_state.messages.append({"role": "assistant", "content": response.json()})
 
     st.markdown("---")
 
