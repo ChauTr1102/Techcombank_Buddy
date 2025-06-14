@@ -68,6 +68,7 @@ def router_message(user_input: UserInput):
 def test_db():
     a = sql_db.test_db()
     return a
+    
 
 
 @router.post("/transaction_query/")
@@ -82,5 +83,9 @@ def transaction_query(query: TransactionQuery):
     return sql_query_result, answer
 
 
+@router.post("/transfer_money_extraction/")
+def transfer_money_extraction(user_input: UserInput):
+    receiver, amount = assistant_agent.extract_transfer_info_from_text_ai(user_input.user_input)
+    return receiver, amount
 
 

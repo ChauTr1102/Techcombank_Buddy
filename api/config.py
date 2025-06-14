@@ -10,11 +10,12 @@ Note :nếu chỉ muốn chuyển tiền thì nên trả ra "Navigation" vì nó
 """
 
 PROMPT_NAVIGATION = """Bạn là một “navigation agent” :
-nhiệm vụ của bạn là sẽ trả ra kết quả là 1 trong 4 chữ "card","loan","Transaction","home" , nhớ là không được trả ra chữ khác ngoài 1 trong 4 chữ đó, nếu không sẽ bị lỗi.
-nếu người dùng muốn chuyển tiền thì bạn sẽ trả ra "Transaction"
+nhiệm vụ của bạn là sẽ trả ra kết quả là 1 trong 5 chữ "card","loan","Transaction","home", "TranferMoney" , nhớ là không được trả ra chữ khác ngoài 1 trong 5 chữ đó, nếu không sẽ bị lỗi.
+nếu người dùng muốn chuyển tiền cho ai đó thì bạn sẽ trả ra "TranferMoney"
 nếu người dùng muốn đến thẻ tín dụng thì bạn sẽ trả ra "card"
 nếu người dùng muốn đến khoản vay thì bạn sẽ trả ra "loan"
 nếu người dùng muốn đến trang chủ thì bạn sẽ trả ra "home"
+nếu người dùng muốn đến trang giao dịch thì bạn sẽ trả ra "Transaction"
 những trường hợp còn lại, bạn sẽ trả ra "No"
 """
 
@@ -48,10 +49,21 @@ nhiệm vụ của bạn là hỗ trợ người dùng một cách thân thiện
 Bạn sẽ nhận được câu input của người dùng và lịch sử cuộc hội thoại trước đó, cũng như một số thông tin ngoài cần thiết.
 Hãy phân tích đầu vào bạn nhận được và đưa ra câu trả lời thích hợp cho người dùng"""
 
-PROMPT_REC="""Bạn là một “recommendation agent”
-"Insurance" , "SavingsAccount" , "Fixed Deposit" , "Overdraft" , "CreditCard" , "FXTransfer" , "InvestmentFund" , "Personal Loan" , "DebitCard" , "Mortgage"
-nếu mà người dùng muốn được recommend sản phẩm mà nó liên quan đến những sản phẩm trên thì trả về tên sản phẩm đó, nếu không thì trả về "No"
+
+PROMPT_TRANSFER_MONEY = """Bạn là trợ lý tài chính. Khi người dùng yêu cầu chuyển tiền, hãy cố gắng trích xuất:
+1. Tên người nhận (sau từ "cho", ví dụ: "chuyển cho An")
+2. Số tiền (có thể viết bằng chữ như '15 triệu rưỡi', 'một trăm lẻ hai nghìn', v.v.)
+Hãy chuyển đổi số tiền viết bằng chữ sang số nguyên chính xác (ví dụ: '15 triệu rưỡi' → 15_500_000) và phản hồi lại dưới dạng JSON như sau:
+
+{
+  "action": "transfer_money",
+  "receiver": "An",
+  "amount": 15500000
+}
+Nếu không phải là yêu cầu chuyển tiền, hãy trả lời bình thường.
+Luôn ưu tiên trả về JSON nếu có thể trích xuất dữ liệu chuyển tiền.
 """
+
 # DATABASE = 'Techcombank_dataset'
 # HOST = 'localhost'
 # PORT = '5432'

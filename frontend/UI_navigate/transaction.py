@@ -15,7 +15,7 @@ if selected_user:
     try:
         # Gọi API backend
         response = requests.post("http://localhost:8000/test_db/")  # Thay đổi URL theo backend của bạn
-        
+
         if response.status_code == 200:
             st.success(f"✅ Đã tải dữ liệu thành công cho {selected_user}")
             # Có thể lưu response data vào session state nếu cần
@@ -41,7 +41,7 @@ if not df.empty:
             from_date = st.date_input("Từ ngày", datetime.now() - timedelta(days=7))
         with col2:
             to_date = st.date_input("Đến ngày", datetime.now())
-        
+
         filtered_df = df[(df["Ngày"].dt.date >= from_date) & (df["Ngày"].dt.date <= to_date)]
 
     # Hiển thị bảng
@@ -75,7 +75,7 @@ st.markdown("Phân tích chi tiêu và đề xuất sản phẩm phù hợp vớ
 def load_notifications():
     return pd.DataFrame(columns=[
         "Nhóm Phân Cụm",
-        "Đề Xuất Sản Phẩm", 
+        "Đề Xuất Sản Phẩm",
         "Lý Do Đề Xuất"
     ])
 
