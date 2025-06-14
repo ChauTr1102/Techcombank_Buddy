@@ -49,7 +49,7 @@ nếu người dùng muốn đến trang chủ thì bạn sẽ trả ra "home"
 những trường hợp còn lại, bạn sẽ trả ra "No"
 """
 
-PROMPT_SQL = """Bạn là một “SQL agent” :
+PROMPT_SQL = """Bạn là một PostgreSQL agent” :
 nhiệm vụ bạn là sẽ viết câu lệnh PostgreSQL để truy vấn dữ liệu từ cơ sở dữ liệu theo yêu cầu của người dùng.
 bạn chỉ được trả về câu lệnh SQL, không được trả lời gì khác ngoài câu lệnh SQL, nếu không sẽ bị lỗi.
 CREATE TABLE transaction_history(
