@@ -15,6 +15,7 @@ from api.services.routing_agent import RoutingAgent
 from api.database.database import SQLDatabase
 from api.services.navigation_agent import NavigationAgent
 from api.services.assistant_agent import AssistantAgent
+from api.services.recommendation_agent import RecommendationAgent
 load_dotenv()
 
 stt = SpeechToText(apikey=os.getenv("API_KEY"))
@@ -24,7 +25,7 @@ sql_db = SQLDatabase()
 nav_agent = NavigationAgent(apikey=os.getenv("API_KEY"))
 sql_agent = SQLAgent(apikey=os.getenv("API_KEY"))
 assistant_agent = AssistantAgent(apikey=os.getenv("API_KEY"))
-
+rec_agent = RecommendationAgent(apikey=os.getenv("API_KEY"))
 
 class UserInput(BaseModel):
     user_input: str

@@ -1,5 +1,5 @@
 from api.services import *
-
+import json
 
 class AssistantAgent:
     def __init__(self, apikey):
@@ -15,7 +15,7 @@ class AssistantAgent:
                 ("system", "**Answer the user's input:** {user_input}"),
             ]
         )
-        prompt = llm_prompt.format(prompt_navigation=PROMPT_NAVIGATION, chat_history=history, user_input=user_input)
+        prompt = llm_prompt.format(prompt_assistant=PROMPT_ASSISTANT, chat_history=history, user_input=user_input)
         return prompt
 
     def assitant_transaction_prompt(self, user_input, history, transaction_data):
@@ -33,3 +33,35 @@ class AssistantAgent:
     def get_answer(self, prompt):
         result = self.model_llm.invoke(prompt)
         return result.content
+
+
+    def extract_transfer_info_from_text_ai(self, user_input):
+        prompt_template = ChatPromptTemplate.from_messages(
+            [
+                ("system", "{prompt}"),
+                ("user", "{input}")
+            ]
+        )
+
+        tranfer_prompt = prompt_template.format_messages(
+            prompt=PROMPT_TRANSFER_MONEY,
+            input=user_input
+        )
+        try:
+            result = self.model_llm.invoke(tranfer_prompt)
+            content = result.content.strip()
+
+            # Tìm JSON trong nội dung trả về
+            json_start = content.find('{')
+            json_end = content.rfind('}')
+            if json_start != -1 and json_end != -1:
+                json_str = content[json_start:json_end + 1]
+                data = json.loads(json_str)
+                if data.get("action") == "transfer_money":
+                    return [data.get("receiver"), data.get("amount")]
+        except Exception as e:
+            print(f"[LLM EXTRACT ERROR] {e}")
+        return None, None
+
+
+    

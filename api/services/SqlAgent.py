@@ -22,9 +22,3 @@ class SQLAgent:
         result = self.model_llm.invoke(prompt)
         return result.content
 
-    # def sql_pull(self, sql_query):
-    #     try:
-    #         result = execute_sql_query(sql_query)
-    #         return result
-    #     except Exception as e:
-    #         return f"An error occurred while executing the SQL query: {str(e)}"
