@@ -81,14 +81,15 @@ with st.sidebar:
         with st.chat_message("user"):
             st.markdown(prompt)
 
+        payload = {"user_input": str(prompt), "history": " "}
+
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                response = (
-                    f"You asked: '{prompt}'. I'm a demo bot, but I'm here to help!"
-                )
+                response = requests.post(url=ROUTER_MESSAGE, json=payload)
                 st.markdown(response)
-
-        st.session_state.messages.append({"role": "assistant", "content": response})
+                if response.json() in ["card", "home", "loan", "transaction"]:
+                    navigate_to_page(response.json())
+            st.session_state.messages.append({"role": "assistant", "content": response})
 
     st.markdown("---")
 
