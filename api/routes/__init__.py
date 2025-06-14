@@ -11,15 +11,21 @@ from api.services.speech_to_text import SpeechToText
 import io
 
 from api.services.routing_agent import RoutingAgent
-
+from api.database.database import SQLDatabase
+from api.services.navigation_agent import NavigationAgent
 load_dotenv()
 
 stt = SpeechToText(apikey=os.getenv("API_KEY"))
 router = APIRouter()
 routing_agent = RoutingAgent(apikey=os.getenv("API_KEY"))
+sql_db = SQLDatabase()
+nav_agent = NavigationAgent(apikey=os.getenv("API_KEY"))
 
 class UserInput(BaseModel):
     user_input: str
     history: str
 
+
+class Query(BaseModel):
+    query: str
 

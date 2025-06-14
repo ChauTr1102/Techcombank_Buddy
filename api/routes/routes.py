@@ -26,17 +26,22 @@ async def transcribe(file: UploadFile = File(...)):
 
     return transcript
 
-@router.post("/sqlAgent/")
-async def sql_agent(query: str):
-    pass
-
 @router.post("/router_message/")
 def router_message(user_input: UserInput):
     prompt = routing_agent.prompt_routing(user_input.user_input, user_input.history)
-    result = routing_agent.routing(prompt)
-    return result
+    result_router = routing_agent.routing(prompt)
+    if result_router == "Navigation":
+        prompt_nav = nav_agent.navigation_prompt(user_input.user_input, user_input.history)
+        result_nav = nav_agent.nav_direction(prompt_nav)
+        return result_nav
+    elif result_router == "Recommendation":
+        return "Recommendation"
+    elif result_router == "Transaction":
+        return "Transaction"
+    elif result_router == "Assistant":
+        return "Assistant"
 
-@router.post("/A2A/")
-async def Agent_to_Agent(user_input: str):
-    Agent_response = MultiAgent(user_input)
-    return Agent_response
+@router.post("/test_db/")
+def test_db():
+    a = sql_db.test_db()
+    return a
