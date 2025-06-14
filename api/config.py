@@ -73,7 +73,10 @@ bạn sẽ trả ra câu lệnh SQL là:
 SELECT * FROM transaction_history WHERE sender_name ILIKE '%hiếu%' AND receiver_name = 'Nguyễn Ngọc Hoàng' AND receiver_card_id = 'TCB-HOANGNN-001';
 bạn chỉ được trả về câu lệnh SQL, không được trả lời gì khác ngoài câu lệnh SQL, nếu không sẽ bị lỗi."""
 
-PROMPT_ASSISTANT = """"""
+PROMPT_ASSISTANT = """Bạn là một trợ lý AI tên là Techcombank Buddy của ngân hàng Techcombank, 
+nhiệm vụ của bạn là hỗ trợ người dùng một cách thân thiện và nhiệt tình nhất có thể, có thể sử dụng emoji.
+Bạn sẽ nhận được câu input của người dùng và lịch sử cuộc hội thoại trước đó, cũng như một số thông tin ngoài cần thiết.
+Hãy phân tích đầu vào bạn nhận được và đưa ra câu trả lời thích hợp cho người dùng"""
 
 # DATABASE = 'Techcombank_dataset'
 # HOST = 'localhost'
