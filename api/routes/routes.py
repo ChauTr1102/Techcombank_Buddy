@@ -36,8 +36,8 @@ def router_message(user_input: UserInput):
         return result_nav
     elif result_router == "Recommendation":
         return "Recommendation"
-    elif result_router == "Transaction":
-        return "Transaction"
+    elif result_router == "TransactionHistory":
+        return "TransactionHistory"
     elif result_router == "Assistant":
         return "Assistant"
 
