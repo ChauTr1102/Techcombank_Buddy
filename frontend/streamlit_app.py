@@ -65,7 +65,6 @@ with st.sidebar:
         if audio_bytes_value != st.session_state.last_audio:
             # Cập nhật last_audio
             st.session_state.last_audio = audio_bytes_value
-            st.markdown("Khác")
             # Thực sự có input mới -> gọi STT
             res = requests.post(
                 SPEECH_TO_TEXT,
@@ -87,7 +86,7 @@ with st.sidebar:
 
         else:
             # Nếu cùng audio, nhảy qua không làm gì thêm
-            st.markdown("giống")
+            pass
 
     st.markdown("---")
 
