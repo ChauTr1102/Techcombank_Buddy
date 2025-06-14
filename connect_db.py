@@ -7,14 +7,14 @@ load_dotenv()
 DATABASE = os.getenv("DATABASE")
 HOST=os.getenv("HOST")
 PORT=os.getenv("PORT")
-USER=os.getenv("USER")
+DB_USER=os.getenv("DB_USER")
 PASSWORD=os.getenv("PASSWORD")
 DB_NAME=os.getenv("DB_NAME")
 
 def test_connection():
     try:
         conn = psycopg2.connect(
-            user=USER,
+            user=DB_USER,
             password=PASSWORD,
             host=HOST,
             port=PORT,
@@ -30,5 +30,5 @@ def test_connection():
         print("❌ Connection failed:", e)
 
 
-print(HOST, PORT, USER, PASSWORD, DB_NAME)
+print(HOST, PORT, DB_USER, PASSWORD, DB_NAME)
 test_connection()
