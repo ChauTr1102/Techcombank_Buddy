@@ -8,8 +8,7 @@ DB_NAME = os.getenv("DATABASE")
 PASSWORD = os.getenv("PASSWORD")
 HOST = os.getenv("HOST")
 PORT = os.getenv("PORT")
-print(DB_USER, DB_NAME, PASSWORD, HOST, PORT)
-print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+
 def test_connection():
     try:
         conn = psycopg2.connect(
