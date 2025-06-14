@@ -1,4 +1,5 @@
 import pandas as pd
+import streamlit as st
 
 def get_ranking(user_id: str) -> list:
     if user_id == "test":
@@ -17,3 +18,16 @@ def get_analysis(user_id: str) -> dict:
     # Placeholder for the actual analysis logic
     if user_id == "test":
         return "Data analysis results for user ID: test"
+    
+def navigate_to_page(navigation_output: str):
+    UI_sample_folder_root = "UI_navigate"
+    if navigation_output == "card":
+        st.switch_page(f"{UI_sample_folder_root}/card.py")
+    elif navigation_output == "home":
+        st.switch_page(f"{UI_sample_folder_root}/home.py")
+    elif navigation_output == "loan":
+        st.switch_page(f"{UI_sample_folder_root}/loan.py")
+    elif navigation_output == "Transaction":
+        st.switch_page(f"{UI_sample_folder_root}/transaction.py")
+    else:
+        st.write("Page not found.")
