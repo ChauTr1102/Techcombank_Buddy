@@ -16,4 +16,10 @@ class SQLAgent:
             ]
         )
         prompt = llm_prompt.format(prompt_routing=PROMPT_ROUTING, chat_history=history, user_input=user_input)
+        result =self.sql_pull(prompt)
+        return result
+    
+    def nav_direction(self, prompt):
+        result = self.model_llm.invoke(prompt)
+        return result.content
         
