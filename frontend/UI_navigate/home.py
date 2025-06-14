@@ -151,4 +151,29 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# i want image of the product to be random in some way, is there a product image library that i can use
+# ========== PRODUCT CARDS ==========
+st.markdown(
+    """
+    <div style='text-align: left; font-size: 24px; margin-bottom: 20px;'>
+        <b>Có thể bạn sẽ thích</b>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# i have 8 images for products, i want to display them randomly in a grid of 2 rows and 4 columns
+import random
+# Randomly shuffle the product images
+product_images = [f"./static/product_{i+1}.png" for i in range(8)]
+random.shuffle(product_images)
+
+# Display the product images in a grid of 2 rows and 4 columns
+for row in range(2):
+    cols = st.columns(4)
+    for i, col in enumerate(cols):
+        with col:
+            st.image(product_images[row * 4 + i], width=80)
+            st.markdown("**product title**")
+            st.caption("short content")
 
