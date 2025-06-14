@@ -8,11 +8,13 @@ import asyncio
 from dotenv import load_dotenv, find_dotenv
 import os
 from api.services.speech_to_text import SpeechToText
+from api.services.SqlAgent import SQLAgent
 import io
 
 from api.services.routing_agent import RoutingAgent
 from api.database.database import SQLDatabase
 from api.services.navigation_agent import NavigationAgent
+from api.services.assistant_agent import AssistantAgent
 load_dotenv()
 
 stt = SpeechToText(apikey=os.getenv("API_KEY"))
@@ -20,6 +22,9 @@ router = APIRouter()
 routing_agent = RoutingAgent(apikey=os.getenv("API_KEY"))
 sql_db = SQLDatabase()
 nav_agent = NavigationAgent(apikey=os.getenv("API_KEY"))
+sql_agent = SQLAgent(apikey=os.getenv("API_KEY"))
+assistant_agent = AssistantAgent(apikey=os.getenv("API_KEY"))
+
 
 class UserInput(BaseModel):
     user_input: str
@@ -28,4 +33,9 @@ class UserInput(BaseModel):
 
 class Query(BaseModel):
     query: str
+
+
+class TransactionQuery(BaseModel):
+    query: str
+    history: str
 

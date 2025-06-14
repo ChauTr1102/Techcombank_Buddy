@@ -10,7 +10,7 @@ class RoutingAgent:
     def route_decision(self, history, user_input):
         pass
 
-    def route_prompt_routing(self, user_input, history):
+    def prompt_routing(self, user_input, history):
         llm_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", "**Instruction 1:**\n {prompt_routing}\n"),

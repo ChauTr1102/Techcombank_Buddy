@@ -41,7 +41,24 @@ def router_message(user_input: UserInput):
     elif result_router == "Assistant":
         return "Assistant"
 
+
 @router.post("/test_db/")
 def test_db():
     a = sql_db.test_db()
     return a
+
+
+@router.post("/transaction_query/")
+def transaction_query(query: TransactionQuery):
+    transaction_prompt = sql_agent.sql_prompt_routing(query.query, query.history)
+    sql_query_result = sql_agent.sql_result_from_llm(transaction_prompt)
+    # fetched_data = sql_db.execute_query(sql_query_result)
+    # # lấy prompt và lấy kết quả từ llm
+    # assistant_prompt = assistant_agent.assitant_transaction_prompt(query.query, query.history, fetched_data)
+    # answer = assistant_agent.get_answer(assistant_prompt)
+
+    return sql_query_result
+
+
+
+

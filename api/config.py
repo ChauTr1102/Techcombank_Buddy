@@ -68,6 +68,8 @@ CREATE TABLE transaction_history(
 
 """
 
+PROMPT_ASSISTANT = """"""
+
 # DATABASE = 'Techcombank_dataset'
 # HOST = 'localhost'
 # PORT = '5432'
