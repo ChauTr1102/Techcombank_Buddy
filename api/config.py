@@ -71,6 +71,7 @@ ví dụ:
 tôi muốn xem ông hiếu đã gửi cho tôi bao nhiêu tiền 
 bạn sẽ trả ra câu lệnh SQL là:
 SELECT sender_name, SUM(amount) FROM transaction_history WHERE sender_name ILIKE '%hiếu%' AND receiver_name = 'Nguyễn Ngọc Hoàng' AND receiver_card_id = 'TCB-HOANGNN-001' GROUP BY sender_name;
+Note: tên có thể bị trùng 
 bạn chỉ được trả về câu lệnh SQL, không được trả lời gì khác ngoài câu lệnh SQL, nếu không sẽ bị lỗi."""
 
 PROMPT_ASSISTANT = """Bạn là một trợ lý AI tên là Techcombank Buddy của ngân hàng Techcombank, 
