@@ -94,8 +94,41 @@ def transfer_money(transfer_info: TransferMoney):
     sql_db.insert_transfer_money_history(transfer_info.receiver, transfer_info.note, transfer_info.amount)
     return 1
 
+
 @router.get("/transaction_history/")
 def get_transaction_history():
     transaction_history = sql_db.get_transaction_history()
     return transaction_history
+
+
+@router.post("/customer-segment/", response_model=CustomerSegmentResponse)
+async def get_customer_segment(request: UserRequest):
+    """Lấy thông tin phân khúc và gợi ý sản phẩm cho khách hàng"""
+    try:
+        # Tải dữ liệu
+        customer_data = rcm_model.load_customer_data()
+        products_data = rcm_model.load_product_data()
+        processed_data = rcm_model.preprocess_for_segmentation(customer_data)
+
+        # Dự đoán phân khúc
+        clusters = rcm_model.load_and_predict(processed_data)
+        customer_data['segment'] = clusters
+
+        # Lấy thông tin phân khúc
+        result = rcm_model.get_customer_segment_from_existing(customer_data, products_data, request.user_id)
+        if result is None:
+            raise HTTPException(status_code=404, detail=f"Không tìm thấy khách hàng với user_id: {request.user_id}")
+
+        return result
+
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    # except Exception as e:
+    #     logger.error(f"Lỗi xử lý yêu cầu: {e}")
+    #     raise HTTPException(status_code=500, detail="Lỗi xử lý yêu cầu")
+    # finally:
+    #     if sql_db:
+    #         sql_db.conn.close()
+
+
 
