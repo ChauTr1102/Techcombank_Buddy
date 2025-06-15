@@ -25,13 +25,6 @@ class RecommendationModel:
                 host="buddy.cy1yg6uaeep7.us-east-1.rds.amazonaws.com",
                 port="5432"
             )
-            # self.conn = psycopg2.connect(
-            #     database="buddy",
-            #     user="postgres",
-            #     password="12345678",
-            #     host="localhost",
-            #     port="5432"
-            # )
         except Exception as e:
             logger.error(f"Lỗi kết nối database: {e}")
             return None

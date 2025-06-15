@@ -70,7 +70,6 @@ def test_db():
     return a
     
 
-
 @router.post("/transaction_query/")
 def transaction_query(query: TransactionQuery):
     transaction_prompt = sql_agent.sql_prompt_routing(query.query, query.history)

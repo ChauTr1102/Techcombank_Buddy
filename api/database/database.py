@@ -13,7 +13,7 @@ class SQLDatabase:
             database=os.getenv("DATABASE"),
             host=os.getenv("HOST"),
             port=os.getenv("PORT"),
-            user=os.getenv("DB_USER"),
+            user=os.getenv("USER"),
             password=os.getenv("PASSWORD"),
         )
         self.cur = conn.cursor()
