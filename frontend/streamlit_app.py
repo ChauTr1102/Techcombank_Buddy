@@ -6,7 +6,8 @@ from streamlit_float import *
 from dotenv import load_dotenv
 from helper import navigate_to_page
 from streamlit_extras.bottom_container import bottom
-from datetime import datetime
+import datetime
+import sys
 import os
 
 # --- PAGE CONFIG ---
@@ -22,39 +23,50 @@ load_dotenv(dotenv_path="./endpoints.env")
 SPEECH_TO_TEXT = os.getenv("SPEECH_TO_TEXT")
 ROUTER_MESSAGE = os.getenv("ROUTER_MESSAGE")
 TRANSFER_MONEY_EXTRACTION = os.getenv("TRANSFER_MONEY_EXTRACTION")
-
+TRANSFER_MONEY = os.getenv("TRANSFER_MONEY")
 
 # --- TRANSFER DIALOG ---
 @st.dialog("transfer money")
-def open_transfer_dialog(receiver, amount):
+def open_transfer_dialog(receiver, amount, note):
     st.write("📤 Nhập thông tin chuyển tiền")
 
     receiver = st.text_input("👤 Người nhận", key="dialog_receiver_trans", value=receiver)
 
     amount = st.number_input("💰 Số tiền", key="dialog_amount_trans", value=amount)
 
-    note = st.text_area("📝 Nội dung chuyển khoản", key="dialog_note_trans")
+    note = st.text_input("📝 Nội dung chuyển khoản", key="dialog_note_trans", value=note)
 
     if st.button("✅ Xác nhận chuyển tiền", key="dialog_confirm_button_trans"):
-        if receiver and amount >= 1000:
-            st.session_state.transfer_success = True
-            st.session_state.transfer_details = {
-                "receiver": receiver,
-                "amount": amount,
-                "note": note,
-                "type": "Chuyển tiền (Dialog)" 
-            }
-            if "new_transactions" not in st.session_state:
-                st.session_state.new_transactions = []
-            st.session_state.new_transactions.append({
-                "Ngày": datetime.now(),
-                "Loại giao dịch": "Chuyển tiền (Dialog)",
-                "Số tiền": -amount,
-                "Mô tả": f"Chuyển đến {receiver} - {note if note else 'Không ghi chú'}"
-            })
-            st.rerun()
+        transfer_data = {
+            "receiver" : receiver,
+            "note" : note,
+            "amount" : amount
+        }
+        response = requests.post(TRANSFER_MONEY, json=transfer_data)
+        if response.status_code == 200:
+            st.success("✅ Chuyển tiền thành công!")
         else:
-            st.warning("⚠️ Vui lòng nhập đầy đủ Người nhận và Số tiền hợp lệ (tối thiểu 1000).")
+            st.markdown("⚠️ Giao dịch không thành công")
+        # if receiver and amount >= 1000:
+        #     st.session_state.transfer_success = True
+        #     st.session_state.transfer_details = {
+        #         "receiver": receiver,
+        #         "amount": amount,
+        #         "note": note,
+        #         "time": datetime.strftime("%Y-%m-%d %H:%M:%S"),
+        #         "type": "Chuyển tiền (Dialog)"
+        #     }
+        #     if "new_transactions" not in st.session_state:
+        #         st.session_state.new_transactions = []
+        #     st.session_state.new_transactions.append({
+        #         "Ngày": datetime.now(),
+        #         "Loại giao dịch": "Chuyển tiền (Dialog)",
+        #         "Số tiền": -amount,
+        #         "Mô tả": f"Chuyển đến {receiver} - {note if note else 'Không ghi chú'}"
+        #     })
+        #     st.rerun()
+        # else:
+        #     st.warning("⚠️ Vui lòng nhập đầy đủ Người nhận và Số tiền hợp lệ (tối thiểu 1000).")
 
 
 
@@ -88,6 +100,9 @@ if "trigger_transfer_dialog" not in st.session_state: # Initialize the flag
 # --- SIDEBAR WIDGETS ---
 with st.sidebar:
 
+    # 1. AUDIO INPUT (with robust reset logic)
+    st.header("Voice Command")
+
     # We use a dynamic key to force a reset after processing
     with bottom():
         if "last_audio" not in st.session_state:
@@ -98,7 +113,7 @@ with st.sidebar:
         )
 
     if audio_bytes:
-    # Lấy bytes và so sánh
+        # Lấy bytes và so sánh
         audio_bytes_value = audio_bytes.getvalue()
         if audio_bytes_value != st.session_state.last_audio:
             # Cập nhật last_audio
@@ -113,21 +128,26 @@ with st.sidebar:
             # Đẩy vào history và gọi router
             st.session_state.messages.append({"role": "user", "content": transcript})
             payload = {"user_input": transcript, "history": ""}
-            response = requests.post(ROUTER_MESSAGE, json=payload)
-            # navigate_to_page(response.json())
-            if response.json() in ["card", "home", "loan", "Transaction"]:
-                navigate_to_page(response.json())
-            elif response.json() == "TranferMoney":
-                payload = {"user_input": transcript, "history": ""}
-                response = requests.post(url=TRANSFER_MONEY_EXTRACTION, json=payload)
-                if response.status_code == 200:
-                    open_transfer_dialog(response.json()[0], response.json()[1])
-            
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking..."):
+                    response = requests.post(ROUTER_MESSAGE, json=payload)
+                    # navigate_to_page(response.json())
+                    st.markdown(response.json())
+                    if response.json() in ["card", "home", "loan", "Transaction"]:
+                        navigate_to_page(response.json())
+                    elif response.json() == "TranferMoney":
+                        payload = {"user_input": transcript, "history": ""}
+                        response = requests.post(url=TRANSFER_MONEY_EXTRACTION, json=payload)
+                        if response.status_code == 200:
+                            open_transfer_dialog(response.json()[0], response.json()[1], response.json()[2])
+
             st.session_state.messages.append({"role": "assistant", "content": response.json()})
 
         else:
             # Nếu cùng audio, nhảy qua không làm gì thêm
             pass
+
+    st.markdown("---")
 
     # 2. CHAT BOX
     st.header("Chat")
@@ -138,7 +158,7 @@ with st.sidebar:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
     with bottom():
-            prompt = st.chat_input("What is up?")
+        prompt = st.chat_input("What is up?")
     if prompt:
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
@@ -156,7 +176,7 @@ with st.sidebar:
                     payload = {"user_input": prompt, "history": ""}
                     response = requests.post(url=TRANSFER_MONEY_EXTRACTION, json=payload)
                     if response.status_code == 200:
-                        open_transfer_dialog(response.json()[0], response.json()[1])
+                        open_transfer_dialog(response.json()[0], response.json()[1], response.json()[2])
                     # navigate_to_page("TranferMoney")
                     # st.rerun()
         st.session_state.messages.append({"role": "assistant", "content": response.json()})
@@ -164,7 +184,7 @@ with st.sidebar:
     st.markdown("---")
 
 
-# --- NAVIGATION ---
+    # --- NAVIGATION ---
     pg = st.navigation(
         [
             st.Page("UI_navigate/home.py", title="Home", icon="🏠"),

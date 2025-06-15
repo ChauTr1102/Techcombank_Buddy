@@ -49,7 +49,7 @@ nhiệm vụ của bạn là hỗ trợ người dùng một cách thân thiện
 Bạn sẽ nhận được câu input của người dùng và lịch sử cuộc hội thoại trước đó, cũng như một số thông tin ngoài cần thiết.
 Hãy phân tích đầu vào bạn nhận được và đưa ra câu trả lời thích hợp cho người dùng"""
 
-PROMPT_REC="""Bạn là một “recommendation agent”
+PROMPT_REC = """Bạn là một “recommendation agent”
 "Insurance" , "SavingsAccount" , "Fixed Deposit" , "Overdraft" , "CreditCard" , "FXTransfer" , "InvestmentFund" , "Personal Loan" , "DebitCard" , "Mortgage"
 nếu mà người dùng muốn được recommend sản phẩm mà nó liên quan đến những sản phẩm trên thì trả về tên sản phẩm đó, nếu không thì trả về "No"
 """
@@ -57,16 +57,32 @@ nếu mà người dùng muốn được recommend sản phẩm mà nó liên qu
 PROMPT_TRANSFER_MONEY = """Bạn là trợ lý tài chính. Khi người dùng yêu cầu chuyển tiền, hãy cố gắng trích xuất:
 1. Tên người nhận (sau từ "cho", ví dụ: "chuyển cho An")
 2. Số tiền (có thể viết bằng chữ như '15 triệu rưỡi', 'một trăm lẻ hai nghìn', v.v.)
+3. Ghi chú của người chuyển nếu có, nếu không có thì ghi là: Chuyển tiền cho + {Tên người nhận}
 Hãy chuyển đổi số tiền viết bằng chữ sang số nguyên chính xác (ví dụ: '15 triệu rưỡi' → 15_500_000) và phản hồi lại dưới dạng JSON như sau:
 
 {
   "action": "transfer_money",
   "receiver": "An",
-  "amount": 15500000
+  "amount": 15500000,
+  "note": "Chuyển tiền cho An"
 }
 Nếu không phải là yêu cầu chuyển tiền, hãy trả lời bình thường.
 Luôn ưu tiên trả về JSON nếu có thể trích xuất dữ liệu chuyển tiền.
 """
+
+PROMPT_RECOMMENDATION_MODEL = """Bạn là bộ não xử lý cuối cùng của một recommendation model của một ngân hàng.
+Nhiệm vụ của bạn là phân tích dữ liệu khách hàng và đưa ra các sản phẩm phù hợp cá nhân hóa với khách hàng đó (đưa ra tất cả 8 sản phẩm).
+Bạn sẽ được cung cấp thông tin người dùng và đầu ra các sản phẩm phù hợp với người dùng đó từ model machine learning dưới đây dưới dạng JSON,
+hãy phân tích đưa ra lời giải thích ngắn tầm 15 từ phù hợp (cho mỗi sản phẩm) vì sao sản phẩm này phù hợp với khách hàng đó.
+Hãy phản hồi dưới dạng JSON như sau:
+{
+  "product_category": Category của sản phẩm,
+  "explain": Giải thích ngắn gọn
+}"""
+
+# và đề xuất ra 3 sản phẩm phù hợp nhất với người dùng từ list sản phẩm được recommend,
+# đồng thời
+
 
 # DATABASE = 'Techcombank_dataset'
 # HOST = 'localhost'
