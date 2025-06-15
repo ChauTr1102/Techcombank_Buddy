@@ -1,15 +1,16 @@
 import streamlit as st
 import pandas as pd
 import requests
-from datetime import datetime, timedelta
-import requests
-from streamlit_extras.bottom_container import bottom
 from dotenv import load_dotenv
+from streamlit_extras.bottom_container import bottom
+import os
+
 load_dotenv(dotenv_path="./endpoints.env")
 
 st.title("🤖 Gợi ý sản phẩm cho khách hàng")
-st.markdown("Theo dõi hoạt động tài chính của bạn một cách rõ ràng và trực quan.")
+st.markdown("Theo dõi hoạt động tài chính và nhận gợi ý sản phẩm phù hợp.")
 
+# --- User Selection ---
 st.subheader("👤 Chọn User")
 users = [
     "ad089c26-f733-4535-9901-bfbf827272b5",
@@ -19,39 +20,75 @@ users = [
     "3d29ae48-1838-44ba-ae30-8a8c4275d138",
     "6eb9c9f6-5fda-44af-a732-b838ab15e8e8",
     "e0da2e4f-4c18-4d59-8d77-3b608e4fa3ff"
-]  # Danh sách users
-selected_user = st.selectbox("Chọn user:", users)
-
-custom_user = st.text_input("Hoặc nhập user ID khác:", value="")
-
-# Final selected user (custom input overrides dropdown)
+]
+selected_user = st.selectbox("Chọn từ danh sách:", users)
+custom_user = st.text_input("Hoặc nhập User ID khác:")
 selected_user = custom_user if custom_user else selected_user
 
-st.write(f"User đã chọn: {selected_user}")
+st.markdown(f"**User đã chọn:** `{selected_user}`")
 
-st.title("Đề Xuất Sản Phẩm")
-st.markdown("Phân tích chi tiêu và đề xuất sản phẩm phù hợp với users.")
+# --- API Calls ---
 def fetch_customer_segment(user_id):
-    API_URL = "http://localhost:8000/customer_segment/"
+    API_URL = os.getenv("SEGMENT_API", "http://localhost:8000/customer_segment/")
     response = requests.post(API_URL, json={"user_id": user_id})
-    if response.status_code == 200:
-        return response.json()
-    else:
-        st.error("Không thể lấy dữ liệu phân khúc khách hàng.")
-        return None
+    return response.json() if response.status_code == 200 else None
 
-customer_segment = fetch_customer_segment(selected_user)
-if customer_segment:
-    st.subheader("Thông tin phân khúc khách hàng")
-    st.write(customer_segment)
+def fetch_explanation_for_recommendation(user_id):
+    API_URL = os.getenv("EXPLAIN_API", "http://localhost:8000/get_explain_for_eight_recommendation/")
+    response = requests.post(API_URL, json={"user_id": user_id})
+    return response.json() if response.status_code == 200 else None
 
-    st.subheader("Gợi ý sản phẩm")
-    if "suggested_products" in customer_segment:
-        suggested_products = customer_segment["suggested_products"]
-        if suggested_products:
-            for product in suggested_products:
-                st.write(f"- {product}")
-        else:
-            st.write("Không có sản phẩm gợi ý.")
-    else:
-        st.write("Không có thông tin gợi ý sản phẩm.")
+# --- Customer Segment Info ---
+segment_data = fetch_customer_segment(selected_user)
+
+if segment_data:
+    st.markdown("## 🧬 Phân khúc khách hàng")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("### 👤 Thông tin khách hàng")
+        info = segment_data.get("customer_info", {})
+        st.write({
+            "Tuổi": info.get("age"),
+            "Tình trạng hôn nhân": info.get("marital_status"),
+            "Nghề nghiệp": info.get("occupation"),
+            "Số người trong hộ": info.get("household_size"),
+            "Thu nhập tháng ($)": round(info.get("monthly_salary", 0), 2),
+            "Thu nhập phân khúc": info.get("income_tier"),
+        })
+
+    with col2:
+        st.markdown("### 📊 Thống kê phân khúc")
+        stats = segment_data.get("segment_stats", {})
+        demo = stats.get("demographics", {})
+        st.write({
+            "Tuổi TB": round(demo.get("avg_age", 0), 2),
+            "Hôn nhân phổ biến": demo.get("common_marital_status"),
+            "Nghề phổ biến": demo.get("common_occupation"),
+            "Hộ trung bình": round(demo.get("avg_household_size", 0), 2),
+        })
+
+    # --- Top 3 Recommended Products ---
+    st.markdown("## 🎯 Top 3 Gợi ý sản phẩm")
+    recommendations = segment_data.get("product_recommendations", [])
+    top3 = sorted(recommendations, key=lambda x: x["reward_value"], reverse=True)[:3]
+
+    for i, product in enumerate(top3, 1):
+        st.markdown(f"""
+        <div style="border:1px solid #ccc;padding:15px;border-radius:10px;margin-bottom:10px;background-color:#f9f9f9">
+            <b>#{i}. {product['category']}</b><br>
+            <ul>
+                <li><b>Tier:</b> {product['tier']}</li>
+                <li><b>Loại phần thưởng:</b> {product['reward_type']}</li>
+                <li><b>Giá trị phần thưởng:</b> {product['reward_value']}%</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+
+# --- Explanation Section ---
+st.markdown("## 📖 Giải thích gợi ý sản phẩm")
+explanation = fetch_explanation_for_recommendation(selected_user)
+if explanation:
+    st.json(explanation)
+else:
+    st.warning("Không thể lấy dữ liệu giải thích.")
