@@ -4,6 +4,8 @@ import requests
 from dotenv import load_dotenv
 from streamlit_extras.bottom_container import bottom
 import os
+import json
+import re
 
 load_dotenv(dotenv_path="./endpoints.env")
 
@@ -33,9 +35,9 @@ def fetch_customer_segment(user_id):
     response = requests.post(API_URL, json={"user_id": user_id})
     return response.json() if response.status_code == 200 else None
 
-def fetch_explanation_for_recommendation(user_id):
+def fetch_explanation_for_recommendation(data):
     API_URL = os.getenv("EXPLAIN_API", "http://localhost:8000/get_explain_for_eight_recommendation/")
-    response = requests.post(API_URL, json={"user_id": user_id})
+    response = requests.post(API_URL, json={"data": f"""{data}"""})
     return response.json() if response.status_code == 200 else None
 
 # --- Customer Segment Info ---
@@ -87,8 +89,23 @@ if segment_data:
 
 # --- Explanation Section ---
 st.markdown("## 📖 Giải thích gợi ý sản phẩm")
-explanation = fetch_explanation_for_recommendation(selected_user)
+explanation = fetch_explanation_for_recommendation(segment_data)
 if explanation:
-    st.json(explanation)
+    # Nếu raw là chuỗi, loại bỏ markdown fence và parse JSON
+    if isinstance(explanation, str):
+        # Loại bỏ ```json và ``` nếu có
+        # Dùng regex để lấy phần giữa hai dấu ```
+        m = re.search(r"```json\s*(\[\s*[\s\S]*?\])\s*```", explanation)
+        json_str = m.group(1) if m else explanation.strip("` \n")
+        try:
+            data = json.loads(json_str)
+            st.json(data)
+        except json.JSONDecodeError as e:
+            st.error(f"Lỗi phân tích JSON: {e}")
+            # Hiện raw gốc để debug
+            st.write(explanation)
+    else:
+        # Nếu đã là object (list/dict), render trực tiếp
+        st.json(explanation)
 else:
     st.warning("Không thể lấy dữ liệu giải thích.")

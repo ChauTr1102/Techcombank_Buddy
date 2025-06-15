@@ -1,6 +1,10 @@
 
 import streamlit as st
 from PIL import Image
+import requests
+import random
+import json
+import re
 
 
 if "messages" not in st.session_state:
@@ -162,18 +166,69 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# i have 8 images for products, i want to display them randomly in a grid of 2 rows and 4 columns
-import random
-# Randomly shuffle the product images
-product_images = [f"./static/product_{i+1}.png" for i in range(8)]
-random.shuffle(product_images)
+CUSTOMER_SEG = "http://localhost:8000/customer_segment/"
 
-# Display the product images in a grid of 2 rows and 4 columns
-for row in range(2):
-    cols = st.columns(4)
-    for i, col in enumerate(cols):
-        with col:
-            st.image(product_images[row * 4 + i], width=80)
-            st.markdown("**product title**")
-            st.caption("short content")
 
+@st.cache_data
+def load_rcm():
+    resp = requests.post(url=CUSTOMER_SEG, json={"user_id": "1fce992a-435c-4363-917c-aed958213b43"})
+    rcm_data = resp.json()
+    return rcm_data
+# Load data
+st.session_state["rcm_data"] = load_rcm()
+
+# # i have 8 images for products, i want to display them randomly in a grid of 2 rows and 4 columns
+# # Randomly shuffle the product images
+# product_images = [f"./static/product_{i+1}.png" for i in range(8)]
+# random.shuffle(product_images)
+
+# # Display the product images in a grid of 2 rows and 4 columns
+# for row in range(2):
+#     cols = st.columns(4)
+#     for i, col in enumerate(cols):
+#         with col:
+#             st.image(product_images[row * 4 + i], width=80)
+#             st.markdown("**product title**")
+#             st.caption("short content")
+
+# Lấy dữ liệu sản phẩm từ API
+EIGHT_RCM = "http://localhost:8000/get_explain_for_eight_recommendation/"
+  # Thay thành endpoint thực tế của bạn
+try:
+    resp = requests.post(EIGHT_RCM, json={"data": f"""{st.session_state["rcm_data"]}"""})
+    resp.raise_for_status()
+    explaination = resp.json()
+    if explaination:
+    # Nếu raw là chuỗi, loại bỏ markdown fence và parse JSON
+        if isinstance(explaination, str):
+            m = re.search(r"```json\s*(\[\s*[\s\S]*?\])\s*```", explaination)
+            json_str = m.group(1) if m else explaination.strip("` \n")
+            try:
+                st.session_state["product_explain"] = json.loads(json_str)
+            except json.JSONDecodeError as e:
+                st.error(f"Lỗi phân tích JSON: {e}")
+                # Hiện raw gốc để debug
+                st.write(explaination)
+except Exception as e:
+    st.error(f"Không thể tải danh sách sản phẩm: {e}")
+    st.session_state["product_explain"] = []
+
+# Đường dẫn ảnh tĩnh, giả định 1-1 với products
+product_images = [f"./static/product_{i+1}.png" for i in range(len(st.session_state["product_explain"]))]
+
+# Hiển thị sản phẩm theo lưới (2 hàng x 4 cột)
+cols_per_row = 4
+rows = (len(st.session_state["product_explain"]) + cols_per_row - 1) // cols_per_row
+idx = 0
+for r in range(rows):
+    cols = st.columns(cols_per_row)
+    for c, col in enumerate(cols):
+        if idx < len(st.session_state["product_explain"]):
+            product = st.session_state["product_explain"][idx]
+            img_path = product_images[idx] if idx < len(product_images) else None
+            with col:
+                if img_path:
+                    st.image(img_path, width=80)
+                st.markdown(f"**{product.get('product_category', '')}**")
+                st.caption(product.get('explain', ''))
+            idx += 1

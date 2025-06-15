@@ -25,6 +25,7 @@ ROUTER_MESSAGE = os.getenv("ROUTER_MESSAGE")
 TRANSFER_MONEY_EXTRACTION = os.getenv("TRANSFER_MONEY_EXTRACTION")
 TRANSFER_MONEY = os.getenv("TRANSFER_MONEY")
 
+
 # --- TRANSFER DIALOG ---
 @st.dialog("transfer money")
 def open_transfer_dialog(receiver, amount, note):
@@ -38,9 +39,9 @@ def open_transfer_dialog(receiver, amount, note):
 
     if st.button("✅ Xác nhận chuyển tiền", key="dialog_confirm_button_trans"):
         transfer_data = {
-            "receiver" : receiver,
-            "note" : note,
-            "amount" : amount
+            "receiver": receiver,
+            "note": note,
+            "amount": amount
         }
         response = requests.post(TRANSFER_MONEY, json=transfer_data)
         if response.status_code == 200:
@@ -69,7 +70,6 @@ def open_transfer_dialog(receiver, amount, note):
         #     st.warning("⚠️ Vui lòng nhập đầy đủ Người nhận và Số tiền hợp lệ (tối thiểu 1000).")
 
 
-
 # --- CUSTOM CSS TO WIDEN THE SIDEBAR ---
 # This is a key part of the solution to make the UI look better.
 st.markdown(
@@ -83,7 +83,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 # --- INITIALIZE SESSION STATE FOR WIDGET RESET ---
 if "audio_key" not in st.session_state:
     st.session_state.audio_key = 0
@@ -92,14 +91,11 @@ if "messages" not in st.session_state:
         {"role": "assistant", "content": "How can I help you today?"}
     ]
 
-if "trigger_transfer_dialog" not in st.session_state: # Initialize the flag
+if "trigger_transfer_dialog" not in st.session_state:  # Initialize the flag
     st.session_state.trigger_transfer_dialog = False
-
-
 
 # --- SIDEBAR WIDGETS ---
 with st.sidebar:
-
     # 1. AUDIO INPUT (with robust reset logic)
     st.header("Voice Command")
 
