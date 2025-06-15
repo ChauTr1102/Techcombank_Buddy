@@ -13,7 +13,7 @@ import os
 # --- PAGE CONFIG ---
 
 st.set_page_config(
-    page_title="Financial Dashboard",
+    page_title="Techcombank Buddy",
     page_icon="💰",
     layout="wide",
     initial_sidebar_state="expanded",
