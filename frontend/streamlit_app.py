@@ -191,6 +191,7 @@ with st.sidebar:
             st.Page("UI_navigate/card.py", title="Credit Cards", icon="💳"),
             st.Page("UI_navigate/loan.py", title="Loans", icon="🏦"),
             st.Page("UI_navigate/transaction.py", title="Transactions", icon="📈"),
+            st.Page("UI_navigate/recommender.py", title="Recommender", icon="🤖")
         ]
     )
 
